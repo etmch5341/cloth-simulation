@@ -33,7 +33,7 @@ export class ClothAnimation extends CanvasAnimation {
         this.box = null;
         // Sphere properties
         this.sphereRadius = 1.5;
-        this.spherePosition = new Vec3([0, 0.2, 0]);
+        this.spherePosition = new Vec3([0, 1.5, 0]);
         this.sphereVisible = true;
         this.testConfigurations = [
             {

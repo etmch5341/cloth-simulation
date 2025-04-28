@@ -84,7 +84,7 @@ export class ClothAnimation extends CanvasAnimation {
   
   // Sphere properties
   private sphereRadius: number = 1.5;
-  private spherePosition: Vec3 = new Vec3([0, 0.2, 0]);
+  private spherePosition: Vec3 = new Vec3([0, 1.5, 0]);
   public sphereVisible: boolean = true;
 
   private canvas2d: HTMLCanvasElement;

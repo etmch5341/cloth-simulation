@@ -10,12 +10,18 @@ export var FabricType;
 })(FabricType || (FabricType = {}));
 export const FABRIC_PRESETS = new Map([
     [FabricType.COTTON, {
+            // structuralStiffness: 5000,
+            // shearStiffness: 100,
+            // bendStiffness: 10,
+            // damping: 25,
+            // mass: 1.0,
+            // stretchFactor: 1.05
             structuralStiffness: 5000,
             shearStiffness: 100,
             bendStiffness: 10,
-            damping: 25,
-            mass: 1.0,
-            stretchFactor: 1.05
+            damping: 5,
+            mass: 20.0,
+            stretchFactor: 1.5
         }],
     [FabricType.SILK, {
             structuralStiffness: 1000,
@@ -235,12 +241,12 @@ export class Cloth {
             for (let j = 0; j < this.cols; j++) {
                 const particle = this.particles[i][j];
                 // Floor collision at y=0
-                if (particle.position.y < 0) {
-                    particle.position.y = 0;
-                    particle.velocity.y *= -0.5; // Bounce with energy loss
+                if (particle.position.y < -1.99) {
+                    particle.position.y = -1.99;
+                    particle.velocity.y *= -0.8; // Bounce with energy loss
                     // Add friction
-                    particle.velocity.x *= 0.9;
-                    particle.velocity.z *= 0.9;
+                    particle.velocity.x *= 0.3;
+                    particle.velocity.z *= 0.3;
                 }
             }
         }
