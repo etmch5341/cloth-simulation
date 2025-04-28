@@ -42,7 +42,6 @@ export class GUI {
         this.reset();
         this.registerEventListeners(canvas);
     }
-    // In ClothGui.ts, add this method:
     setMode(mode) {
         this.mode = mode;
     }
@@ -215,6 +214,49 @@ export class GUI {
                 this.animation.reset();
                 break;
             }
+            case "KeyT": {
+                // Run the sphere drop test
+                this.animation.initSphereDropTest();
+                break;
+            }
+            case "KeyA": {
+                // Test all fabric types in sequence
+                this.animation.testFabricGrid();
+                break;
+            }
+            case "KeyF": {
+                // Run the fancy sphere test
+                this.animation.initFancySphereTest();
+                break;
+            }
+            case "KeyG": {
+                // Run the fabric grid test
+                this.animation.testFabricGrid();
+                break;
+            }
+            case "KeyS": {
+                // Toggle sphere visibility
+                this.animation.sphereVisible = !this.animation.sphereVisible;
+                break;
+            }
+            case "Digit1":
+            case "Digit2":
+            case "Digit3":
+            case "Digit4":
+            case "Digit5":
+            case "Digit6": {
+                // Run test 0-5 based on which number key was pressed
+                const testIndex = parseInt(key.code.replace("Digit", "")) - 1;
+                if (testIndex >= 0 && testIndex < 6) {
+                    this.animation.runClothTest(testIndex);
+                }
+                break;
+            }
+            case "KeyZ": {
+                // Analyze cloth behavior
+                this.animation.analyzeClothBehavior();
+                break;
+            }
             case "ArrowLeft": {
                 this.camera.roll(GUI.rollSpeed, false);
                 break;
@@ -250,30 +292,6 @@ export class GUI {
                 // Toggle wind
                 this.windEnabled = !this.windEnabled;
                 this.animation.toggleWind(this.windEnabled, this.windStrength);
-                break;
-            }
-            case "Digit1": {
-                // Change fabric type to cotton
-                this.currentFabricType = FabricType.COTTON;
-                this.animation.setFabricType(this.currentFabricType);
-                break;
-            }
-            case "Digit2": {
-                // Change fabric type to silk
-                this.currentFabricType = FabricType.SILK;
-                this.animation.setFabricType(this.currentFabricType);
-                break;
-            }
-            case "Digit3": {
-                // Change fabric type to leather
-                this.currentFabricType = FabricType.LEATHER;
-                this.animation.setFabricType(this.currentFabricType);
-                break;
-            }
-            case "Digit4": {
-                // Change fabric type to rubber
-                this.currentFabricType = FabricType.RUBBER;
-                this.animation.setFabricType(this.currentFabricType);
                 break;
             }
             default: {

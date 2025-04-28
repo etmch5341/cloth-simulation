@@ -41,8 +41,6 @@ export const clothVSText = `
     }
 `;
 
-// In ClothShaders.ts, modify the fragment shader:
-
 export const clothFSText = `
     precision mediump float;
     
@@ -195,5 +193,66 @@ export const pointFSText = `
         vec3 color = vIsFixed > 0.5 ? fixedColor : freeColor;
         
         gl_FragColor = vec4(color, 1.0);
+    }
+`;
+
+// Add sphere shaders for visualization
+export const sphereVSText = `
+    precision mediump float;
+    
+    attribute vec3 vertPosition;
+    attribute vec3 vertNormal;
+    
+    uniform mat4 mWorld;
+    uniform mat4 mView;
+    uniform mat4 mProj;
+    uniform vec4 lightPosition;
+    
+    varying vec3 fragNormal;
+    varying vec3 fragPosition;
+    varying vec4 lightDir;
+    
+    void main() {
+        // Transform to world space
+        vec4 worldPosition = mWorld * vec4(vertPosition, 1.0);
+        fragPosition = worldPosition.xyz;
+        
+        // Transform to clip space
+        gl_Position = mProj * mView * worldPosition;
+        
+        // Pass normal to fragment shader
+        fragNormal = (mWorld * vec4(vertNormal, 0.0)).xyz;
+        
+        // Light direction
+        lightDir = lightPosition - worldPosition;
+    }
+`;
+
+export const sphereFSText = `
+    precision mediump float;
+    
+    varying vec3 fragNormal;
+    varying vec3 fragPosition;
+    varying vec4 lightDir;
+    
+    uniform vec3 sphereColor;
+    uniform vec3 cameraPosition;
+    
+    void main() {
+        // Normalize vectors
+        vec3 normal = normalize(fragNormal);
+        vec3 lightDir = normalize(lightDir.xyz);
+        vec3 viewDir = normalize(cameraPosition - fragPosition);
+        vec3 halfVector = normalize(lightDir + viewDir);
+        
+        // Lighting calculations
+        float ambient = 0.2;
+        float diffuse = max(dot(normal, lightDir), 0.0) * 0.6;
+        float specular = pow(max(dot(normal, halfVector), 0.0), 64.0) * 0.4;
+        
+        // Apply lighting to color
+        vec3 finalColor = sphereColor * (ambient + diffuse) + vec3(1.0) * specular;
+        
+        gl_FragColor = vec4(finalColor, 1.0);
     }
 `;

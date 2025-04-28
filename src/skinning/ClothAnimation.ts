@@ -13,12 +13,13 @@ import {
   springVSText,
   springFSText,
   pointVSText,
-  pointFSText
+  pointFSText,
+  sphereVSText,
+  sphereFSText
 } from "./ClothShaders.js";
 import { floorVSText, floorFSText, sBackVSText, sBackFSText } from "./Shaders.js";
 import { Cloth, FabricType, FABRIC_PRESETS } from "./Cloth.js";
 import { SphereCollider, BoxCollider } from "./CollisionObjects.js";
-
 
 enum RenderMode {
   SHADED,
@@ -26,6 +27,22 @@ enum RenderMode {
   POINTS,
   SPRINGS,
   DEBUG
+}
+
+// Define test configurations for different scenarios
+interface ClothTestConfig {
+  name: string;
+  fabricType: FabricType;
+  sphereRadius: number;
+  spherePosition: Vec3;
+  pinCorners: boolean;
+  pinCenter: boolean;
+  gravity: Vec3;
+  clothDensity: number;
+  clothHeight: number;
+  windEnabled: boolean;
+  windStrength: number;
+  windDirection: Vec3;
 }
 
 export class ClothAnimation extends CanvasAnimation {
@@ -42,6 +59,7 @@ export class ClothAnimation extends CanvasAnimation {
   private wireframeRenderPass: RenderPass;
   private springRenderPass: RenderPass;
   private pointRenderPass: RenderPass;
+  private sphereRenderPass: RenderPass;
 
   /* Scrub bar background rendering info */
   private sBackRenderPass: RenderPass;
@@ -63,14 +81,101 @@ export class ClothAnimation extends CanvasAnimation {
   // Collision objects
   private sphere: SphereCollider | null = null;
   private box: BoxCollider | null = null;
+  
+  // Sphere properties
+  private sphereRadius: number = 1.5;
+  private spherePosition: Vec3 = new Vec3([0, 0.2, 0]);
+  public sphereVisible: boolean = true;
 
   private canvas2d: HTMLCanvasElement;
   private ctx2: CanvasRenderingContext2D | null;
-
-  // Add these properties to the ClothAnimation class
-    private sphereRadius: number = 1.5;
-    private spherePosition: Vec3 = new Vec3([0, 1.5, 0]);
-    private sphereVisible: boolean = true;
+  
+  private testConfigurations: ClothTestConfig[] = [
+    {
+      name: "Cotton Basic",
+      fabricType: FabricType.COTTON,
+      sphereRadius: 1.5,
+      spherePosition: new Vec3([0, 1.5, 0]),
+      pinCorners: false,
+      pinCenter: false,
+      gravity: new Vec3([0, -9.8, 0]),
+      clothDensity: 20,
+      clothHeight: 4.0,
+      windEnabled: false,
+      windStrength: 0,
+      windDirection: new Vec3([0, 0, 1])
+    },
+    {
+      name: "Silk Drape",
+      fabricType: FabricType.SILK,
+      sphereRadius: 1.5,
+      spherePosition: new Vec3([0, 1.5, 0]),
+      pinCorners: false,
+      pinCenter: false,
+      gravity: new Vec3([0, -9.8, 0]),
+      clothDensity: 25,
+      clothHeight: 4.0,
+      windEnabled: false,
+      windStrength: 0,
+      windDirection: new Vec3([0, 0, 1])
+    },
+    {
+      name: "Leather Stiff",
+      fabricType: FabricType.LEATHER,
+      sphereRadius: 1.5,
+      spherePosition: new Vec3([0, 1.5, 0]),
+      pinCorners: false,
+      pinCenter: false,
+      gravity: new Vec3([0, -9.8, 0]),
+      clothDensity: 15,
+      clothHeight: 4.0,
+      windEnabled: false,
+      windStrength: 0,
+      windDirection: new Vec3([0, 0, 1])
+    },
+    {
+      name: "Rubber Stretch",
+      fabricType: FabricType.RUBBER,
+      sphereRadius: 1.5,
+      spherePosition: new Vec3([0, 1.5, 0]),
+      pinCorners: false,
+      pinCenter: false,
+      gravity: new Vec3([0, -9.8, 0]),
+      clothDensity: 15,
+      clothHeight: 4.0,
+      windEnabled: false,
+      windStrength: 0,
+      windDirection: new Vec3([0, 0, 1])
+    },
+    {
+      name: "Wind Test",
+      fabricType: FabricType.SILK,
+      sphereRadius: 1.5,
+      spherePosition: new Vec3([0, 1.5, 0]),
+      pinCorners: false,
+      pinCenter: false,
+      gravity: new Vec3([0, -9.8, 0]),
+      clothDensity: 20,
+      clothHeight: 4.0,
+      windEnabled: true,
+      windStrength: 10.0,
+      windDirection: new Vec3([1, 0, 1]).normalize()
+    },
+    {
+      name: "Centerpiece",
+      fabricType: FabricType.COTTON,
+      sphereRadius: 2.0,
+      spherePosition: new Vec3([0, 2.0, 0]),
+      pinCorners: true,
+      pinCenter: true,
+      gravity: new Vec3([0, -9.8, 0]),
+      clothDensity: 30,
+      clothHeight: 5.0,
+      windEnabled: false,
+      windStrength: 0,
+      windDirection: new Vec3([0, 0, 1])
+    }
+  ];
 
   constructor(canvas: HTMLCanvasElement) {
     super(canvas);
@@ -123,8 +228,7 @@ export class ClothAnimation extends CanvasAnimation {
    */
   public reset(): void {
     this.gui.reset();
-    this.initCloth();
-    // this.initSphereDropTest();
+    this.initSphereDropTest();
   }
 
   public getCloth(): Cloth {
@@ -192,55 +296,6 @@ export class ClothAnimation extends CanvasAnimation {
     this.initSpringRenderPass();
     this.initPointRenderPass();
   }
-
-// In ClothAnimation.ts, modify the initCloth method:
-
-// public initCloth(): void {
-//     // Create new cloth with more rows/columns for better draping
-//     this.cloth = new Cloth(
-//       this.clothWidth,
-//       this.clothHeight,
-//       20,  // More rows
-//       20,  // More columns
-//       this.fabricType
-//     );
-    
-//     // Position the cloth higher above the ground
-//     for (let i = 0; i < this.cloth.particles.length; i++) {
-//       for (let j = 0; j < this.cloth.particles[i].length; j++) {
-//         // Move all particles up to start higher
-//         this.cloth.particles[i][j].position.y += 3.0;
-//         this.cloth.particles[i][j].oldPosition.y += 3.0;
-        
-//         // Pin only the corners for a more dramatic drape
-//         if ((i === 0 && j === 0) || 
-//             (i === 0 && j === this.cloth.particles[0].length - 1) ||
-//             (i === this.cloth.particles.length - 1 && j === 0) ||
-//             (i === this.cloth.particles.length - 1 && j === this.cloth.particles[0].length - 1)) {
-//           this.cloth.particles[i][j].setFixed(true);
-//         } else {
-//           this.cloth.particles[i][j].setFixed(false);
-//         }
-//       }
-//     }
-    
-//     // Create sphere as a collision object
-//     this.sphere = new SphereCollider(new Vec3([0, 1.0, 0]), 1.0);
-//     this.cloth.addCollisionObject(this.sphere);
-    
-//     // Create box as another collision object
-//     this.box = new BoxCollider(new Vec3([2.0, 0.5, 0]), new Vec3([1.0, 1.0, 1.0]));
-//     this.cloth.addCollisionObject(this.box);
-    
-//     // Initialize render passes
-//     this.initClothRenderPass();
-//     this.initWireframeRenderPass();
-//     this.initSpringRenderPass();
-//     this.initPointRenderPass();
-    
-//     // Start in simulation mode so the cloth falls immediately
-//     this.gui.setMode(Mode.playback);
-//   }
 
   private initClothRenderPass(): void {
     const meshData = this.cloth.generateMeshData();
@@ -444,6 +499,150 @@ export class ClothAnimation extends CanvasAnimation {
     this.pointRenderPass.setup();
   }
 
+  // Generate sphere geometry
+  private generateSphereGeometry(radius: number, rings: number, sectors: number): {
+    positions: Float32Array,
+    normals: Float32Array,
+    indices: Uint32Array
+  } {
+    const positions: number[] = [];
+    const normals: number[] = [];
+    const indices: number[] = [];
+    
+    // Generate vertices
+    for (let i = 0; i <= rings; i++) {
+      const theta = i * Math.PI / rings;
+      const sinTheta = Math.sin(theta);
+      const cosTheta = Math.cos(theta);
+      
+      for (let j = 0; j <= sectors; j++) {
+        const phi = j * 2 * Math.PI / sectors;
+        const sinPhi = Math.sin(phi);
+        const cosPhi = Math.cos(phi);
+        
+        // Position
+        const x = cosPhi * sinTheta;
+        const y = cosTheta;
+        const z = sinPhi * sinTheta;
+        
+        // Scaled position
+        positions.push(radius * x);
+        positions.push(radius * y);
+        positions.push(radius * z);
+        
+        // Normal (unit vector)
+        normals.push(x);
+        normals.push(y);
+        normals.push(z);
+      }
+    }
+    
+    // Generate indices
+    for (let i = 0; i < rings; i++) {
+      for (let j = 0; j < sectors; j++) {
+        const first = i * (sectors + 1) + j;
+        const second = first + sectors + 1;
+        
+        // First triangle
+        indices.push(first);
+        indices.push(second);
+        indices.push(first + 1);
+        
+        // Second triangle
+        indices.push(second);
+        indices.push(second + 1);
+        indices.push(first + 1);
+      }
+    }
+    
+    return {
+      positions: new Float32Array(positions),
+      normals: new Float32Array(normals),
+      indices: new Uint32Array(indices)
+    };
+  }
+  
+  // Initialize sphere rendering
+  private initSphereRenderPass(): void {
+    const gl = this.ctx;
+    
+    // Generate sphere geometry
+    const sphereGeometry = this.generateSphereGeometry(
+      this.sphereRadius,
+      20,  // rings
+      30   // sectors
+    );
+    
+    // Create render pass for sphere
+    this.sphereRenderPass = new RenderPass(this.extVAO, gl, sphereVSText, sphereFSText);
+    
+    // Set vertex buffer data
+    this.sphereRenderPass.setIndexBufferData(sphereGeometry.indices);
+    
+    // Add attributes
+    this.sphereRenderPass.addAttribute("vertPosition", 3, gl.FLOAT, false,
+      3 * Float32Array.BYTES_PER_ELEMENT, 0, undefined, sphereGeometry.positions);
+    
+    this.sphereRenderPass.addAttribute("vertNormal", 3, gl.FLOAT, false,
+      3 * Float32Array.BYTES_PER_ELEMENT, 0, undefined, sphereGeometry.normals);
+    
+    // Add uniforms
+    this.sphereRenderPass.addUniform("mWorld",
+      (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
+        // Create world matrix that positions the sphere
+        const worldMatrix = new Mat4().setIdentity();
+        worldMatrix.translate(this.spherePosition);
+        gl.uniformMatrix4fv(loc, false, new Float32Array(worldMatrix.all()));
+      });
+    
+    this.sphereRenderPass.addUniform("mView",
+      (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
+        gl.uniformMatrix4fv(loc, false, new Float32Array(this.gui.viewMatrix().all()));
+      });
+    
+    this.sphereRenderPass.addUniform("mProj",
+      (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
+        gl.uniformMatrix4fv(loc, false, new Float32Array(this.gui.projMatrix().all()));
+      });
+    
+    this.sphereRenderPass.addUniform("lightPosition",
+      (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
+        gl.uniform4fv(loc, this.lightPosition.xyzw);
+      });
+    
+    this.sphereRenderPass.addUniform("sphereColor",
+      (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
+        // Choose color based on fabric type for visual distinction
+        let color: Float32Array;
+        switch(this.fabricType) {
+          case FabricType.COTTON:
+            color = new Float32Array([0.5, 0.5, 0.8]); // Bluish
+            break;
+          case FabricType.SILK:
+            color = new Float32Array([0.8, 0.8, 0.5]); // Yellowish
+            break;
+          case FabricType.LEATHER:
+            color = new Float32Array([0.8, 0.5, 0.3]); // Brown
+            break;
+          case FabricType.RUBBER:
+            color = new Float32Array([0.3, 0.8, 0.3]); // Green
+            break;
+          default:
+            color = new Float32Array([0.8, 0.2, 0.2]); // Red
+        }
+        gl.uniform3fv(loc, color);
+      });
+    
+    this.sphereRenderPass.addUniform("cameraPosition",
+      (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
+        gl.uniform3fv(loc, this.gui.cameraPosition().xyz);
+      });
+    
+    // Set draw data
+    this.sphereRenderPass.setDrawData(gl.TRIANGLES, sphereGeometry.indices.length, gl.UNSIGNED_INT, 0);
+    this.sphereRenderPass.setup();
+  }
+
   private updateClothRenderPass(): void {
     // Get updated mesh data
     const meshData = this.cloth.generateMeshData();
@@ -610,6 +809,11 @@ export class ClothAnimation extends CanvasAnimation {
       });
     this.springRenderPass.setDrawData(this.ctx.LINES, springData.indices.length, this.ctx.UNSIGNED_INT, 0);
     this.springRenderPass.setup();
+    
+    // If the sphere is active, update its render pass too
+    if (this.sphereVisible && this.sphere) {
+      this.initSphereRenderPass();
+    }
   }
 
   /** @internal
@@ -668,11 +872,15 @@ export class ClothAnimation extends CanvasAnimation {
     const gl: WebGLRenderingContext = this.ctx;
     gl.viewport(x, y, width, height);
   
-    // Draw floor (keep backface culling enabled for performance)
-    gl.enable(gl.CULL_FACE);
+    // Draw floor
     this.floorRenderPass.draw();
+    
+    // Draw sphere if visible
+    if (this.sphereVisible && this.sphere) {
+      this.sphereRenderPass.draw();
+    }
   
-    // Disable backface culling for the cloth to see it from both sides
+    // Draw cloth (disable backface culling to see both sides)
     gl.disable(gl.CULL_FACE);
     
     // Draw cloth based on render mode
@@ -705,15 +913,11 @@ export class ClothAnimation extends CanvasAnimation {
         break;
     }
     
-    // Re-enable backface culling for other objects
+    // Re-enable culling
     gl.enable(gl.CULL_FACE);
-    
-    // Draw collision objects for debugging
-    // (Would need additional render passes for sphere, box etc.)
   }
-  
+
   // Methods to interact with the cloth simulation
-  
   public setRenderMode(mode: RenderMode): void {
     this.renderMode = mode;
   }
@@ -744,5 +948,332 @@ export class ClothAnimation extends CanvasAnimation {
   
   public getGUI(): GUI {
     return this.gui;
+  }
+  
+  // Sphere drop test methods
+  public initSphereDropTest(
+    fabricType: FabricType = FabricType.COTTON,
+    clothDensity: number = 20,
+    sphereRadius: number = 1.5,
+    spherePosition: Vec3 = new Vec3([0, 1.5, 0]),
+    clothHeight: number = 4.0
+  ): void {
+    // Update sphere properties
+    this.sphereRadius = sphereRadius;
+    this.spherePosition = spherePosition;
+    this.fabricType = fabricType;
+    
+    // Create new cloth with specified density
+    this.cloth = new Cloth(
+      this.clothWidth,
+      this.clothHeight,
+      clothDensity,
+      clothDensity,
+      this.fabricType
+    );
+    
+    // Customize cloth based on fabric type
+    const fabricProps = FABRIC_PRESETS.get(this.fabricType)!;
+    
+    // Position the cloth higher above the sphere
+    const clothStartY = spherePosition.y + sphereRadius + clothHeight;
+    
+    // Calculate cloth size to drape nicely over sphere
+    const clothSize = sphereRadius * 3.0; // Cloth should be 3x sphere diameter
+    const stepSize = clothSize / (clothDensity - 1);
+    
+    // Position cloth particles
+    for (let i = 0; i < this.cloth.particles.length; i++) {
+      for (let j = 0; j < this.cloth.particles[i].length; j++) {
+        // Calculate position to center cloth over sphere
+        const x = (j * stepSize) - (clothSize / 2) + spherePosition.x;
+        const z = (i * stepSize) - (clothSize / 2) + spherePosition.z;
+        
+        this.cloth.particles[i][j].position.x = x;
+        this.cloth.particles[i][j].position.y = clothStartY;
+        this.cloth.particles[i][j].position.z = z;
+        
+        // Update old position to match
+        this.cloth.particles[i][j].oldPosition.x = x;
+        this.cloth.particles[i][j].oldPosition.y = clothStartY;
+        this.cloth.particles[i][j].oldPosition.z = z;
+        
+        // Pin corners to create a hanging cloth effect
+        if ((i === 0 && j === 0) || 
+            (i === 0 && j === this.cloth.particles[0].length - 1) ||
+            (i === this.cloth.particles.length - 1 && j === 0) ||
+            (i === this.cloth.particles.length - 1 && j === this.cloth.particles[0].length - 1)) {
+          this.cloth.particles[i][j].setFixed(true);
+        } else {
+          this.cloth.particles[i][j].setFixed(false);
+        }
+      }
+    }
+    
+    // Create sphere collider
+    this.sphere = new SphereCollider(this.spherePosition, this.sphereRadius);
+    this.cloth.clearCollisionObjects(); // Clear any existing colliders
+    this.cloth.addCollisionObject(this.sphere);
+    
+    // Initialize render passes
+    this.initClothRenderPass();
+    this.initWireframeRenderPass();
+    this.initSpringRenderPass();
+    this.initPointRenderPass();
+    this.initSphereRenderPass();
+    
+    // Start in simulation mode
+    this.gui.setMode(Mode.playback);
+    
+    // Display fabric type in console
+    console.log(`Testing ${FabricType[this.fabricType]} fabric on sphere`);
+  }
+  
+  // Run a specific test configuration
+  public runClothTest(configIndex: number): void {
+    if (configIndex < 0 || configIndex >= this.testConfigurations.length) {
+      console.error(`Invalid test configuration index: ${configIndex}`);
+      return;
+    }
+    
+    const config = this.testConfigurations[configIndex];
+    console.log(`Running cloth test: ${config.name}`);
+    
+    // Set up basic parameters
+    this.fabricType = config.fabricType;
+    this.sphereRadius = config.sphereRadius;
+    this.spherePosition = config.spherePosition;
+    
+    // Create cloth with specified density
+    this.cloth = new Cloth(
+      this.clothWidth,
+      this.clothHeight,
+      config.clothDensity,
+      config.clothDensity,
+      this.fabricType
+    );
+    
+    // Set gravity
+    this.cloth.gravity = config.gravity;
+    
+    // Calculate cloth dimensions and positioning
+    const clothStartY = config.spherePosition.y + config.sphereRadius + config.clothHeight;
+    const clothSize = config.sphereRadius * 3.0; // Cloth size proportional to sphere
+    const stepSize = clothSize / (config.clothDensity - 1);
+    
+    // Position and configure cloth particles
+    for (let i = 0; i < this.cloth.particles.length; i++) {
+      for (let j = 0; j < this.cloth.particles[i].length; j++) {
+        // Calculate position to center cloth over sphere
+        const x = (j * stepSize) - (clothSize / 2) + config.spherePosition.x;
+        const z = (i * stepSize) - (clothSize / 2) + config.spherePosition.z;
+        
+        this.cloth.particles[i][j].position.x = x;
+        this.cloth.particles[i][j].position.y = clothStartY;
+        this.cloth.particles[i][j].position.z = z;
+        
+        // Update old position to match
+        this.cloth.particles[i][j].oldPosition.x = x;
+        this.cloth.particles[i][j].oldPosition.y = clothStartY;
+        this.cloth.particles[i][j].oldPosition.z = z;
+        
+        // Unpin all particles by default
+        this.cloth.particles[i][j].setFixed(false);
+        
+        // Pin corners if specified
+        if (config.pinCorners) {
+          if ((i === 0 && j === 0) || 
+              (i === 0 && j === this.cloth.particles[0].length - 1) ||
+              (i === this.cloth.particles.length - 1 && j === 0) ||
+              (i === this.cloth.particles.length - 1 && j === this.cloth.particles[0].length - 1)) {
+            this.cloth.particles[i][j].setFixed(true);
+          }
+        }
+        
+        // Pin center if specified
+        if (config.pinCenter && 
+            i === Math.floor(this.cloth.particles.length / 2) && 
+            j === Math.floor(this.cloth.particles[0].length / 2)) {
+          this.cloth.particles[i][j].setFixed(true);
+        }
+      }
+    }
+    
+    // Create sphere collider
+    this.sphere = new SphereCollider(this.spherePosition, this.sphereRadius);
+    this.cloth.clearCollisionObjects();
+    this.cloth.addCollisionObject(this.sphere);
+    
+    // Configure wind if enabled
+    if (config.windEnabled) {
+      this.cloth.windStrength = config.windStrength;
+      this.cloth.windDirection = config.windDirection;
+    } else {
+      this.cloth.windStrength = 0;
+    }
+    
+    // Initialize render passes
+    this.initClothRenderPass();
+    this.initWireframeRenderPass();
+    this.initSpringRenderPass();
+    this.initPointRenderPass();
+    this.initSphereRenderPass();
+    
+    // Start simulation
+    this.gui.setMode(Mode.playback);
+  }
+  
+  // Run all test configurations in sequence
+  public runAllClothTests(): void {
+    let currentIndex = 0;
+    const testInterval = 8000; // 8 seconds per test
+    
+    const runNextTest = () => {
+      if (currentIndex < this.testConfigurations.length) {
+        this.runClothTest(currentIndex);
+        currentIndex++;
+        setTimeout(runNextTest, testInterval);
+      }
+    };
+    
+    runNextTest();
+  }
+  
+  // Test all fabric types with different positions
+  public testFabricGrid(): void {
+    // Create a grid of spheres with different fabric types
+    const fabricTests = [
+      { type: FabricType.COTTON, position: new Vec3([-3, 1.5, -3]) },
+      { type: FabricType.SILK, position: new Vec3([3, 1.5, -3]) },
+      { type: FabricType.LEATHER, position: new Vec3([-3, 1.5, 3]) },
+      { type: FabricType.RUBBER, position: new Vec3([3, 1.5, 3]) }
+    ];
+    
+    // We could use multiple cloth instances in a more complex simulation
+    // For now, we'll just do consecutive tests
+    let currentIndex = 0;
+    
+    const runNextTest = () => {
+      if (currentIndex < fabricTests.length) {
+        const test = fabricTests[currentIndex];
+        this.initSphereDropTest(
+          test.type,
+          20, // density
+          1.5, // radius
+          test.position,
+          4.0 // cloth height
+        );
+        
+        currentIndex++;
+        setTimeout(runNextTest, 5000); // 5 seconds between tests
+      }
+    };
+    
+    runNextTest();
+  }
+  
+  // Create a fancy sphere test with interactive controls
+  public initFancySphereTest(): void {
+    // Create high-resolution cloth
+    const highResDensity = 30;
+    
+    // Position sphere in center
+    const centerPosition = new Vec3([0, 2.0, 0]);
+    
+    // Create larger sphere
+    const largeRadius = 2.0;
+    
+    // Use silk for smoother draping
+    this.initSphereDropTest(
+      FabricType.SILK,
+      highResDensity,
+      largeRadius,
+      centerPosition,
+      5.0 // higher drop height for more dramatic effect
+    );
+    
+    // Pin cloth at corners and some interior points for more interesting draping
+    for (let i = 0; i < this.cloth.particles.length; i++) {
+      for (let j = 0; j < this.cloth.particles[i].length; j++) {
+        // Unpin everything first
+        this.cloth.particles[i][j].setFixed(false);
+        
+        // Pin corners
+        if ((i === 0 && j === 0) || 
+            (i === 0 && j === this.cloth.particles[0].length - 1) ||
+            (i === this.cloth.particles.length - 1 && j === 0) ||
+            (i === this.cloth.particles.length - 1 && j === this.cloth.particles[0].length - 1)) {
+          this.cloth.particles[i][j].setFixed(true);
+        }
+        
+        // Add some pinned points near middle for more complex draping
+        if (i === Math.floor(this.cloth.particles.length / 2) && 
+            j === Math.floor(this.cloth.particles[0].length / 2)) {
+          this.cloth.particles[i][j].setFixed(true);
+        }
+      }
+    }
+    
+    // Adjust gravity for more realistic movement
+    this.cloth.gravity = new Vec3([0, -12.0, 0]);
+    
+    // Start in simulation mode
+    this.gui.setMode(Mode.playback);
+  }
+  
+  // Analyze cloth behavior
+  public analyzeClothBehavior(): void {
+    // This would be used to print statistics about the cloth simulation
+    // For example, measuring how closely the cloth conforms to the sphere
+    
+    if (!this.cloth || !this.sphere) return;
+    
+    // Measure maximum penetration depth
+    let maxPenetration = 0;
+    let avgPenetration = 0;
+    let penetrationCount = 0;
+    
+    // Analyze conformity to sphere
+    for (let i = 0; i < this.cloth.particles.length; i++) {
+      for (let j = 0; j < this.cloth.particles[i].length; j++) {
+        const particle = this.cloth.particles[i][j];
+        
+        // Calculate distance from particle to sphere center
+        const distToCenter = Vec3.distance(particle.position, this.spherePosition);
+        
+        // Check if particle is penetrating or touching the sphere
+        if (distToCenter <= this.sphereRadius + 0.1) {
+          // Calculate penetration depth
+          const penetration = this.sphereRadius - distToCenter;
+          if (penetration > 0) {
+            maxPenetration = Math.max(maxPenetration, penetration);
+            avgPenetration += penetration;
+            penetrationCount++;
+          }
+        }
+      }
+    }
+    
+    // Calculate average penetration
+    if (penetrationCount > 0) {
+      avgPenetration /= penetrationCount;
+    }
+    
+    // Calculate total energy in the system
+    const totalEnergy = this.cloth.totalEnergy;
+    
+    // Log analysis results
+    console.log("Cloth Behavior Analysis:");
+    console.log(`- Fabric Type: ${FabricType[this.fabricType]}`);
+    console.log(`- Max Penetration: ${maxPenetration.toFixed(4)}`);
+    console.log(`- Avg Penetration: ${avgPenetration.toFixed(4)}`);
+    console.log(`- Particles Touching Sphere: ${penetrationCount}`);
+    console.log(`- Total Energy: ${totalEnergy.toFixed(2)}`);
+    
+    // Different fabric types will show different behavior:
+    // - Cotton: Moderate draping, balanced behavior
+    // - Silk: Smoother draping, closer conformity to sphere
+    // - Leather: Stiffer, less conformity, maintains shape
+    // - Rubber: Stretchier, can penetrate more but bounces
   }
 }
