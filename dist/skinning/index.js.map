@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/skinning/index.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,cAAc,EAAE,MAAM,qBAAqB,CAAC;AAErD,MAAM,UAAU,gBAAgB;IAC9B,MAAM,MAAM,GAAG,QAAQ,CAAC,cAAc,CAAC,UAAU,CAAsB,CAAC;IACxE,mBAAmB;IACnB,MAAM,eAAe,GAAmB,IAAI,cAAc,CAAC,MAAM,CAAC,CAAC;IACnE,eAAe,CAAC,KAAK,EAAE,CAAC;AAC1B,CAAC;AAED,gBAAgB,EAAE,CAAC"}

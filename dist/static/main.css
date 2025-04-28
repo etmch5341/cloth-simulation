@@ -1,0 +1,56 @@
+:root {
+    --blk    : #333;
+    --d-gry  : #777;
+    --m-gry  : #aaa;
+    --l-gry  : #ddd;
+    --wht    : #fafafa;
+    --shadow : 0 5px 10px #000000aa;
+    --margins: 20px;
+    --padding: 10px; 
+    --radius : 5px;
+
+    --accent : #ff8200;
+    --good   : #373;
+    --warn   : #663;
+    --bad    : #733;
+}
+
+html {
+    height: 100%;
+}
+
+.manual img {
+    width: 100%;
+}
+
+body {
+    height: 100%;
+}
+
+.card {
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: var(--padding);
+}
+
+.container {
+    position: relative;
+    width: 800px;
+    margin: auto;
+}
+
+#glCanvas {
+    border: 1px solid var(--m-gry);
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    padding: 0;
+}
+
+#textCanvas {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 10;
+    padding: 0;
+}
