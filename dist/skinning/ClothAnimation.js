@@ -111,7 +111,7 @@ export class ClothAnimation extends CanvasAnimation {
                 fabricType: FabricType.COTTON,
                 sphereRadius: 2.0,
                 spherePosition: new Vec3([0, 2.0, 0]),
-                pinCorners: true,
+                pinCorners: false,
                 pinCenter: true,
                 gravity: new Vec3([0, -9.8, 0]),
                 clothDensity: 30,
