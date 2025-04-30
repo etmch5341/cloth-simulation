@@ -171,8 +171,8 @@ export class ClothAnimation extends CanvasAnimation {
       gravity: new Vec3([0, -9.8, 0]),
       clothDensity: 30,
       clothHeight: 5.0,
-      windEnabled: false,
-      windStrength: 0,
+      windEnabled: true,
+      windStrength: 1000.0,
       windDirection: new Vec3([0, 0, 1])
     }
   ];
