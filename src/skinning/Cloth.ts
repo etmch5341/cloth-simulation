@@ -21,33 +21,27 @@ interface FabricProperties {
 
 export const FABRIC_PRESETS: Map<FabricType, FabricProperties> = new Map([
   [FabricType.COTTON, {
-    // structuralStiffness: 5000,
-    // shearStiffness: 100,
-    // bendStiffness: 10,
-    // damping: 25,
-    // mass: 1.0,
-    // stretchFactor: 1.05
     structuralStiffness: 5000,
     shearStiffness: 100,
     bendStiffness: 10,
     damping: 5,
-    mass: 20.0,
-    stretchFactor: 1.5
+    mass: 1.0,
+    stretchFactor: 1.05
   }],
   [FabricType.SILK, {
     structuralStiffness: 1000,
     shearStiffness: 50,
     bendStiffness: 5,
-    damping: 15,
-    mass: 0.5,
+    damping: 5,
+    mass: 1.0,
     stretchFactor: 1.1
   }],
   [FabricType.LEATHER, {
     structuralStiffness: 10000,
     shearStiffness: 5000,
-    bendStiffness: 1000,
-    damping: 50,
-    mass: 2.0,
+    bendStiffness: 10000,
+    damping: 5,
+    mass: 6.0,
     stretchFactor: 1.01
   }],
   [FabricType.RUBBER, {

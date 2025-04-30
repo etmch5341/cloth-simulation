@@ -149,29 +149,29 @@ export class ClothAnimation extends CanvasAnimation {
     },
     {
       name: "Wind Test",
-      fabricType: FabricType.SILK,
+      fabricType: FabricType.COTTON,
       sphereRadius: 1.5,
       spherePosition: new Vec3([0, 1.5, 0]),
       pinCorners: false,
-      pinCenter: false,
+      pinCenter: true,
       gravity: new Vec3([0, -9.8, 0]),
       clothDensity: 20,
       clothHeight: 4.0,
       windEnabled: true,
-      windStrength: 10.0,
+      windStrength: 75.0,
       windDirection: new Vec3([1, 0, 1]).normalize()
     },
     {
       name: "Centerpiece",
       fabricType: FabricType.COTTON,
-      sphereRadius: 2.0,
-      spherePosition: new Vec3([0, 2.0, 0]),
+      sphereRadius: 1.5,
+      spherePosition: new Vec3([0, 1.5, 0]),
       pinCorners: false,
       pinCenter: true,
       gravity: new Vec3([0, -9.8, 0]),
       clothDensity: 30,
-      clothHeight: 5.0,
-      windEnabled: true,
+      clothHeight: 4.0,
+      windEnabled: false,
       windStrength: 1000.0,
       windDirection: new Vec3([0, 0, 1])
     }
@@ -203,7 +203,8 @@ export class ClothAnimation extends CanvasAnimation {
     this.backgroundColor = new Vec4([0.0, 0.37254903, 0.37254903, 1.0]);
 
     this.initFloor();
-    this.initCloth();
+    // this.initCloth();
+    this.initSphereDropTest();
 
     // Status bar
     this.sBackRenderPass = new RenderPass(this.extVAO, gl, sBackVSText, sBackFSText);

@@ -112,7 +112,7 @@ export class GUI implements IGUI {
     this.selectedParticleCol = -1;
 
     this.camera = new Camera(
-      new Vec3([0, 2, -6]),
+      new Vec3([0, 18, -12]),
       new Vec3([0, 0, 0]),
       new Vec3([0, 1, 0]),
       45,

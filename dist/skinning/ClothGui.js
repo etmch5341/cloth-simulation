@@ -62,7 +62,7 @@ export class GUI {
         this.isDraggingParticle = false;
         this.selectedParticleRow = -1;
         this.selectedParticleCol = -1;
-        this.camera = new Camera(new Vec3([0, 2, -6]), new Vec3([0, 0, 0]), new Vec3([0, 1, 0]), 45, this.width / this.viewPortHeight, 0.1, 1000.0);
+        this.camera = new Camera(new Vec3([0, 18, -12]), new Vec3([0, 0, 0]), new Vec3([0, 1, 0]), 45, this.width / this.viewPortHeight, 0.1, 1000.0);
     }
     /**
      * Sets the GUI's camera to the given camera
