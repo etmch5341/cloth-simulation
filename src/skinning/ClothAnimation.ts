@@ -15,11 +15,14 @@ import {
   pointVSText,
   pointFSText,
   sphereVSText,
-  sphereFSText
+  sphereFSText,
+  skyboxVSText,
+  skyboxFSText
 } from "./ClothShaders.js";
 import { floorVSText, floorFSText, sBackVSText, sBackFSText } from "./Shaders.js";
 import { Cloth, FabricType, FABRIC_PRESETS } from "./Cloth.js";
 import { SphereCollider, BoxCollider } from "./CollisionObjects.js";
+import { Skybox } from "./Skybox.js";
 
 enum RenderMode {
   SHADED,
@@ -86,6 +89,11 @@ export class ClothAnimation extends CanvasAnimation {
   private sphereRadius: number = 1.5;
   private spherePosition: Vec3 = new Vec3([0, 1.5, 0]);
   public sphereVisible: boolean = true;
+
+  // Skybox properties
+  private skybox: Skybox;
+  private skyboxRenderPass: RenderPass;
+  private skyboxSize: number;
 
   private canvas2d: HTMLCanvasElement;
   private ctx2: CanvasRenderingContext2D | null;
@@ -203,6 +211,13 @@ export class ClothAnimation extends CanvasAnimation {
     this.backgroundColor = new Vec4([0.0, 0.37254903, 0.37254903, 1.0]);
 
     this.initFloor();
+
+    // Initialize skybox 
+    this.skybox = new Skybox();
+    this.skyboxRenderPass = new RenderPass(this.extVAO, gl, skyboxVSText, skyboxFSText);
+    this.skyboxSize = 800.0; // Make the skybox large enough to encompass the entire scene
+    this.initSkyboxRenderPass();
+
     // this.initCloth();
     this.initSphereDropTest();
 
@@ -276,6 +291,67 @@ export class ClothAnimation extends CanvasAnimation {
     this.floorRenderPass.setDrawData(this.ctx.TRIANGLES, this.floor.indicesFlat().length, this.ctx.UNSIGNED_INT, 0);
     this.floorRenderPass.setup();
   }
+
+  /**
+     * Sets up the skybox rendering
+     */
+    private initSkyboxRenderPass(): void {
+        this.skyboxRenderPass.setIndexBufferData(Skybox.indicesFlat());
+        
+        this.skyboxRenderPass.addAttribute("aVertPos",
+            4,
+            this.ctx.FLOAT,
+            false,
+            4 * Float32Array.BYTES_PER_ELEMENT,
+            0,
+            undefined,
+            Skybox.positionsFlat()
+        );
+        
+        this.skyboxRenderPass.addAttribute("aNorm",
+            4,
+            this.ctx.FLOAT,
+            false,
+            4 * Float32Array.BYTES_PER_ELEMENT,
+            0,
+            undefined,
+            Skybox.normalsFlat()
+        );
+        
+        this.skyboxRenderPass.addAttribute("aUV",
+            3, // 3D texture coordinates for skybox
+            this.ctx.FLOAT,
+            false,
+            3 * Float32Array.BYTES_PER_ELEMENT,
+            0,
+            undefined,
+            Skybox.uvFlat()
+        );
+        
+        this.skyboxRenderPass.addUniform("uProj",
+            (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
+                gl.uniformMatrix4fv(loc, false, new Float32Array(this.gui.projMatrix().all()));
+        });
+        
+        this.skyboxRenderPass.addUniform("uView",
+            (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
+                gl.uniformMatrix4fv(loc, false, new Float32Array(this.gui.viewMatrix().all()));
+        });
+        
+        this.skyboxRenderPass.addUniform("uTime",
+            (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
+                gl.uniform1f(loc, performance.now() / 1000.0);
+        });
+        
+        this.skyboxRenderPass.setDrawData(
+            this.ctx.TRIANGLES, 
+            Skybox.indicesFlat().length, 
+            this.ctx.UNSIGNED_INT, 
+            0
+        );
+        
+        this.skyboxRenderPass.setup();
+    }
 
   public initCloth(): void {
     // Create new cloth
@@ -872,6 +948,26 @@ export class ClothAnimation extends CanvasAnimation {
   private drawScene(x: number, y: number, width: number, height: number): void {
     const gl: WebGLRenderingContext = this.ctx;
     gl.viewport(x, y, width, height);
+
+    // 1. Render skybox first
+    // Disable depth writes (but keep depth testing)
+    gl.depthMask(false);
+    
+    gl.disable(gl.CULL_FACE);
+    
+    // Disable depth testing for skybox
+    gl.disable(gl.DEPTH_TEST);
+    
+    // Draw skybox
+    this.skyboxRenderPass.draw();
+    
+    // Restore state for rest of scene
+    gl.enable(gl.CULL_FACE);
+    gl.enable(gl.DEPTH_TEST);
+    gl.cullFace(gl.BACK);
+    
+    // Re-enable depth writes for regular scene geometry
+    gl.depthMask(true);
   
     // Draw floor
     this.floorRenderPass.draw();

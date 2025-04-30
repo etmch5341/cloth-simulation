@@ -21,7 +21,7 @@ with each other or the floor.
  - ~~Improve all cloth tests (should not blow up, improve wind test by having higher wind number)~~
  - ~~Move cam back for all, so can see the cloth directly~~
  - ~~Starting scene should not have cloth conflicting~~
- - Minecraft skybox (and maybe lighting) so not as dark
+ - ~~Minecraft skybox (and maybe lighting) so not as dark~~ lighting still bad and shaders still have the random patches of blue triangles
 
 ### Toggling
  - Toggle b/w different scenes and tests (ensure that they all work)
@@ -43,7 +43,7 @@ with each other or the floor.
 # Plans
 
 #### 4/30
- - All improvements
+ - ~~All improvements~~
  - Finish toggling (for all current features and ensure that they work)
  - Different Tests: Demo diff # of faces
  - Squishy Object (squishy ball) Implementation
