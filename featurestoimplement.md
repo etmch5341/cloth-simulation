@@ -24,7 +24,7 @@ with each other or the floor.
  - ~~Minecraft skybox (and maybe lighting) so not as dark~~ lighting still bad and shaders still have the random patches of blue triangles
 
 ### Toggling
- - Toggle b/w different scenes and tests (ensure that they all work)
+ - ~~Toggle b/w different scenes and tests (ensure that they all work)~~
  - button to enable/disable corner point/center point
  - Can type number of faces (for the face tests)
  - ~~Reset should replay the current animation enabled w/ updated params if they changed~~
