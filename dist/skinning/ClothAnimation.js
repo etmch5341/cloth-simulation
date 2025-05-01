@@ -36,7 +36,23 @@ export class ClothAnimation extends CanvasAnimation {
         this.sphereRadius = 1.5;
         this.spherePosition = new Vec3([0, 1.5, 0]);
         this.sphereVisible = true;
+        // Current test tracker
+        this.currentTestIndex = 0;
         this.testConfigurations = [
+            {
+                name: "Sphere Drop Test",
+                fabricType: FabricType.COTTON,
+                sphereRadius: 1.5,
+                spherePosition: new Vec3([0, 1.5, 0]),
+                pinCorners: true,
+                pinCenter: false,
+                gravity: new Vec3([0, -9.8, 0]),
+                clothDensity: 20,
+                clothHeight: 4.0,
+                windEnabled: true,
+                windStrength: 20.0,
+                windDirection: new Vec3([0, 0, 1])
+            },
             {
                 name: "Cotton Basic",
                 fabricType: FabricType.COTTON,
@@ -165,7 +181,8 @@ export class ClothAnimation extends CanvasAnimation {
      */
     reset() {
         this.gui.reset();
-        this.initSphereDropTest();
+        // this.initSphereDropTest();
+        this.runClothTest(this.currentTestIndex);
     }
     getCloth() {
         return this.cloth;
@@ -768,6 +785,8 @@ export class ClothAnimation extends CanvasAnimation {
             console.error(`Invalid test configuration index: ${configIndex}`);
             return;
         }
+        // Store the current test index
+        this.currentTestIndex = configIndex;
         const config = this.testConfigurations[configIndex];
         console.log(`Running cloth test: ${config.name}`);
         // Set up basic parameters

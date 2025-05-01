@@ -44,6 +44,7 @@ with each other or the floor.
 
 #### 4/30
  - ~~All improvements~~
+ - ~~removed gravity setting~~
  - Finish toggling (for all current features and ensure that they work)
  - Different Tests: Demo diff # of faces
  - Squishy Object (squishy ball) Implementation
