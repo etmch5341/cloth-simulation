@@ -53,7 +53,6 @@ with each other or the floor.
  
 
 #### 5/1
- - Squishy Object (squishy ball) Implementation
  - Peridynamics Implementation
  - visualization mode to cloth
  - Free tests

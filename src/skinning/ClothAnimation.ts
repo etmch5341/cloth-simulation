@@ -512,7 +512,7 @@ export class ClothAnimation extends CanvasAnimation {
       
     this.wireframeRenderPass.addUniform("wireColor",
       (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
-        gl.uniform3fv(loc, new Float32Array([0.0, 0.0, 0.0])); // Black wireframe
+        gl.uniform3fv(loc, new Float32Array([0.0, 1.0, 0.0])); // Green wireframe
       });
     
     this.wireframeRenderPass.setDrawData(this.ctx.LINE_STRIP, meshData.indices.length, this.ctx.UNSIGNED_INT, 0);
@@ -842,7 +842,7 @@ export class ClothAnimation extends CanvasAnimation {
       });
     this.wireframeRenderPass.addUniform("wireColor",
       (gl: WebGLRenderingContext, loc: WebGLUniformLocation) => {
-        gl.uniform3fv(loc, new Float32Array([0.0, 0.0, 0.0]));
+        gl.uniform3fv(loc, new Float32Array([0.0, 1.0, 0.0])); // Green wire
       });
     this.wireframeRenderPass.setDrawData(this.ctx.LINE_STRIP, meshData.indices.length, this.ctx.UNSIGNED_INT, 0);
     this.wireframeRenderPass.setup();
@@ -1556,5 +1556,37 @@ export class ClothAnimation extends CanvasAnimation {
     // - Silk: Smoother draping, closer conformity to sphere
     // - Leather: Stiffer, less conformity, maintains shape
     // - Rubber: Stretchier, can penetrate more but bounces
+  }
+
+  public cycleRenderMode(): void {
+    // Get the current render mode
+    const currentMode = this.renderMode;
+    
+    // Cycle to the next mode
+    switch (currentMode) {
+      case RenderMode.SHADED:
+        this.renderMode = RenderMode.WIREFRAME;
+        console.log("Switched to Spring View (Wireframe)");
+        break;
+      case RenderMode.WIREFRAME:
+        this.renderMode = RenderMode.POINTS;
+        console.log("Switched to Particle View");
+        break;
+      case RenderMode.POINTS:
+        this.renderMode = RenderMode.SPRINGS;
+        console.log("Switched to Spring Network View");
+        break;
+      case RenderMode.SPRINGS:
+        this.renderMode = RenderMode.SHADED;
+        console.log("Switched to Normal View");
+        break;
+      default:
+        this.renderMode = RenderMode.SHADED;
+    }
+  }
+  
+  // Add this getter method
+  public getRenderMode(): RenderMode {
+    return this.renderMode;
   }
 }

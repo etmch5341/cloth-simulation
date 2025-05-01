@@ -373,7 +373,8 @@ export class GUI implements IGUI {
         break;
       }
       case "KeyV": {
-        // Toggle render modes (would need to be implemented in ClothAnimation)
+        // Cycle through render modes
+        this.animation.cycleRenderMode();
         break;
       }
       case "KeyM": {
