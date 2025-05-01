@@ -1626,6 +1626,7 @@ export class ClothAnimation extends CanvasAnimation {
       windEnabled?: boolean;
       windStrength?: number;
       windDirection?: Vec3;
+      resetPins?: boolean; // Add this new parameter
     }
   ): void {
     // Store the current configuration index
@@ -1717,7 +1718,10 @@ export class ClothAnimation extends CanvasAnimation {
       this.cloth.windDirection = this.testConfigurations[currentIndex].windDirection;
       
       // Update pin status for corners and center
-      this.updatePinStatus();
+    //   this.updatePinStatus();
+      if (params.resetPins === true) {
+        this.updatePinStatus();
+      }
     }
   }
   

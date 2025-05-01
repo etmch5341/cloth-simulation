@@ -1230,7 +1230,10 @@ export class ClothAnimation extends CanvasAnimation {
                 this.testConfigurations[currentIndex].windStrength : 0;
             this.cloth.windDirection = this.testConfigurations[currentIndex].windDirection;
             // Update pin status for corners and center
-            this.updatePinStatus();
+            //   this.updatePinStatus();
+            if (params.resetPins === true) {
+                this.updatePinStatus();
+            }
         }
     }
     // Helper method to update pin status based on configuration
@@ -1238,26 +1241,27 @@ export class ClothAnimation extends CanvasAnimation {
         const config = this.testConfigurations[this.currentTestIndex];
         const rows = this.cloth.particles.length;
         const cols = this.cloth.particles[0].length;
-        // First, identify which particles should be pinned or unpinned
-        const lastRow = rows - 1;
-        const lastCol = cols - 1;
-        const centerRow = Math.floor(rows / 2);
-        const centerCol = Math.floor(cols / 2);
-        // Corner particles
-        const cornerParticles = [
-            { row: 0, col: 0 },
-            { row: 0, col: lastCol },
-            { row: lastRow, col: 0 },
-            { row: lastRow, col: lastCol }
-        ];
-        // Center particle
-        const centerParticle = { row: centerRow, col: centerCol };
-        // Update corner pins
-        for (const corner of cornerParticles) {
-            this.cloth.particles[corner.row][corner.col].setFixed(config.pinCorners);
+        // Reset all pins
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                this.cloth.particles[i][j].setFixed(false);
+            }
         }
-        // Update center pin
-        this.cloth.particles[centerParticle.row][centerParticle.col].setFixed(config.pinCenter);
+        // Pin corners if specified
+        if (config.pinCorners) {
+            const lastRow = rows - 1;
+            const lastCol = cols - 1;
+            this.cloth.particles[0][0].setFixed(true);
+            this.cloth.particles[0][lastCol].setFixed(true);
+            this.cloth.particles[lastRow][0].setFixed(true);
+            this.cloth.particles[lastRow][lastCol].setFixed(true);
+        }
+        // Pin center if specified
+        if (config.pinCenter) {
+            const centerRow = Math.floor(rows / 2);
+            const centerCol = Math.floor(cols / 2);
+            this.cloth.particles[centerRow][centerCol].setFixed(true);
+        }
     }
     /**
    * Get the current fabric type

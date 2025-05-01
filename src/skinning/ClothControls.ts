@@ -26,6 +26,7 @@ export class ClothControls {
   private stretchFactorValue: HTMLSpanElement;
   private pinCornersCheckbox: HTMLInputElement;
   private pinCenterCheckbox: HTMLInputElement;
+  private resetPinsButton: HTMLButtonElement;
   private clothDensitySlider: HTMLInputElement;
   private clothDensityValue: HTMLSpanElement;
   private windEnabledCheckbox: HTMLInputElement;
@@ -209,6 +210,8 @@ export class ClothControls {
         <input type="range" id="cloth-density" min="5" max="50" value="20" step="1">
         <span id="cloth-density-value">20</span>
       </div>
+
+      <button id="reset-pins">Reset Pin Configuration</button>
     `;
     
     this.customControlsContainer.appendChild(clothConfigGroup);
@@ -218,6 +221,7 @@ export class ClothControls {
     this.pinCenterCheckbox = document.getElementById("pin-center") as HTMLInputElement;
     this.clothDensitySlider = document.getElementById("cloth-density") as HTMLInputElement;
     this.clothDensityValue = document.getElementById("cloth-density-value") as HTMLSpanElement;
+    this.resetPinsButton = document.getElementById("reset-pins") as HTMLButtonElement;
   }
   
   private createWindControls(): void {
@@ -303,6 +307,11 @@ export class ClothControls {
     this.pinCornersCheckbox.addEventListener("change", () => this.updateCustomParameters());
     this.pinCenterCheckbox.addEventListener("change", () => this.updateCustomParameters());
     
+    this.resetPinsButton.addEventListener("click", () => {
+      // Call a method to explicitly reset pins
+      this.resetPinConfiguration();
+    });
+
     this.clothDensitySlider.addEventListener("input", () => {
       this.clothDensityValue.textContent = this.clothDensitySlider.value;
       // Only update when slider release, as changing density requires recreating the cloth
@@ -438,5 +447,19 @@ export class ClothControls {
       // If we have direct access to cloth, explicitly set wind to 0
       cloth.windStrength = 0;
     }
+  }
+
+  private resetPinConfiguration(): void {
+    if (!this.isCustomSimulation) return;
+    
+    // Create parameters with only pin configuration
+    const params: any = {
+      pinCorners: this.pinCornersCheckbox.checked,
+      pinCenter: this.pinCenterCheckbox.checked,
+      resetPins: true // Add this flag to indicate explicit reset
+    };
+    
+    // Update the simulation
+    this.animation.updateCustomParameters(params);
   }
 }
