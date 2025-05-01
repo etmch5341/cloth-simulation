@@ -42,6 +42,7 @@ with each other or the floor.
  - auto panning cam so that it moves around in a circle facing the center, good for display (make as a toggle)
  - ~~visualization mode to cloth~~
  - Cutting cloth?
+ - Adding textures/images on the cloth
 
 
 # Plans
@@ -58,4 +59,5 @@ with each other or the floor.
  - ~~visualization mode to cloth~~
  - ~~Free tests~~
  - Toggling for All new tests and items implemented from 4/30
+ - ~~Lighting improvements (so sphere is not dark)~~
  - Additional Features

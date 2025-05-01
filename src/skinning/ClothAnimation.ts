@@ -746,20 +746,20 @@ export class ClothAnimation extends CanvasAnimation {
         // Choose color based on fabric type for visual distinction
         let color: Float32Array;
         switch(this.fabricType) {
-          case FabricType.COTTON:
-            color = new Float32Array([0.5, 0.5, 0.8]); // Bluish
-            break;
-          case FabricType.SILK:
-            color = new Float32Array([0.8, 0.8, 0.5]); // Yellowish
-            break;
-          case FabricType.LEATHER:
-            color = new Float32Array([0.8, 0.5, 0.3]); // Brown
-            break;
-          case FabricType.RUBBER:
-            color = new Float32Array([0.3, 0.8, 0.3]); // Green
-            break;
-          default:
-            color = new Float32Array([0.8, 0.2, 0.2]); // Red
+            case FabricType.COTTON:
+              color = new Float32Array([0.5, 0.7, 1.0]); // Brighter bluish
+              break;
+            case FabricType.SILK:
+              color = new Float32Array([1.0, 1.0, 0.7]); // Brighter yellowish
+              break;
+            case FabricType.LEATHER:
+              color = new Float32Array([1.0, 0.7, 0.4]); // Brighter brown
+              break;
+            case FabricType.RUBBER:
+              color = new Float32Array([0.4, 1.0, 0.4]); // Brighter green
+              break;
+            default:
+              color = new Float32Array([1.0, 0.5, 0.5]); // Brighter red
         }
         gl.uniform3fv(loc, color);
       });
@@ -1655,7 +1655,7 @@ export class ClothAnimation extends CanvasAnimation {
         mass: params.mass !== undefined ? params.mass : currentProps.mass,
         stretchFactor: params.stretchFactor !== undefined ? params.stretchFactor : currentProps.stretchFactor
       };
-      
+
       // Override the current fabric type's properties
       FABRIC_PRESETS.set(this.fabricType, customProps);
     }

@@ -236,13 +236,16 @@ export const sphereFSText = `
         vec3 viewDir = normalize(cameraPosition - fragPosition);
         vec3 halfVector = normalize(lightDir + viewDir);
         
-        // Lighting calculations
-        float ambient = 0.2;
-        float diffuse = max(dot(normal, lightDir), 0.0) * 0.6;
-        float specular = pow(max(dot(normal, halfVector), 0.0), 64.0) * 0.4;
+        // Lighting calculations - INCREASED VALUES
+        float ambient = 0.4;     // Increased from 0.2
+        float diffuse = max(dot(normal, lightDir), 0.0) * 0.8;  // Increased from 0.6
+        float specular = pow(max(dot(normal, halfVector), 0.0), 32.0) * 0.6;  // Increased from 0.4
         
         // Apply lighting to color
         vec3 finalColor = sphereColor * (ambient + diffuse) + vec3(1.0) * specular;
+        
+        // Ensure the color doesn't exceed 1.0 (optional)
+        finalColor = min(finalColor, vec3(1.0));
         
         gl_FragColor = vec4(finalColor, 1.0);
     }
