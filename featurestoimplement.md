@@ -10,7 +10,7 @@ with each other or the floor.
 
 ## Should Implement
 
-### REQUIRED: Squishy Object
+### REQUIRED: Squishy Object -> PROBABLY SKIP FOR NOW
  - Implement squishy ball being dropped
 
 ### REQUIRED: Peridynamics
@@ -40,6 +40,7 @@ with each other or the floor.
  - Game Dev where blow up ball using Space and wasd to move (make one level or something)
  - WASD to move squishy object
  - auto panning cam so that it moves around in a circle facing the center, good for display (make as a toggle)
+ - visualization mode to cloth
 
 
 # Plans
@@ -49,10 +50,12 @@ with each other or the floor.
  - ~~removed gravity setting~~
  - ~~Finish toggling (for all current features and ensure that they work)~~
  - ~~Different Tests: Demo diff # of faces~~
- - Squishy Object (squishy ball) Implementation
- - Peridynamics Implementation
+ 
 
 #### 5/1
+ - Squishy Object (squishy ball) Implementation
+ - Peridynamics Implementation
+ - visualization mode to cloth
  - Free tests
  - Toggling for All new tests and items implemented from 4/30
  - Additional Features
