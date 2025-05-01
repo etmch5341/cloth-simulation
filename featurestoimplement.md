@@ -40,7 +40,8 @@ with each other or the floor.
  - Game Dev where blow up ball using Space and wasd to move (make one level or something)
  - WASD to move squishy object
  - auto panning cam so that it moves around in a circle facing the center, good for display (make as a toggle)
- - visualization mode to cloth
+ - ~~visualization mode to cloth~~
+ - Cutting cloth?
 
 
 # Plans
@@ -54,7 +55,7 @@ with each other or the floor.
 
 #### 5/1
  - Peridynamics Implementation
- - visualization mode to cloth
+ - ~~visualization mode to cloth~~
  - Free tests
  - Toggling for All new tests and items implemented from 4/30
  - Additional Features

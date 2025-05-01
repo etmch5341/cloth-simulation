@@ -281,23 +281,23 @@ export class GUI {
                 this.mode = this.mode === Mode.edit ? Mode.playback : Mode.edit;
                 break;
             }
-            case "KeyC": {
-                // Cut cloth at mouse position
-                const ray = this.getRayFromScreen(this.mousePosition.x, this.mousePosition.y);
-                this.animation.cutCloth(ray.position, ray.direction);
-                break;
-            }
+            //   case "KeyC": {
+            //     // Cut cloth at mouse position
+            //     const ray = this.getRayFromScreen(this.mousePosition.x, this.mousePosition.y);
+            //     this.animation.cutCloth(ray.position, ray.direction);
+            //     break;
+            //   }
             case "KeyV": {
                 // Cycle through render modes
                 this.animation.cycleRenderMode();
                 break;
             }
-            case "KeyM": {
-                // Toggle wind
-                this.windEnabled = !this.windEnabled;
-                this.animation.toggleWind(this.windEnabled, this.windStrength);
-                break;
-            }
+            //   case "KeyM": {
+            //     // Toggle wind
+            //     this.windEnabled = !this.windEnabled;
+            //     this.animation.toggleWind(this.windEnabled, this.windStrength);
+            //     break;
+            //   }
             default: {
                 console.log("Key : '", key.code, "' was pressed.");
                 break;
