@@ -11,7 +11,7 @@ export class ClothControls {
   
   // Custom parameter UI elements
   private customControlsContainer: HTMLDivElement;
-  private fabricTypeSelect: HTMLSelectElement;
+  private fabricTypeSelect: HTMLInputElement;
   private structuralStiffnessSlider: HTMLInputElement;
   private structuralStiffnessValue: HTMLSpanElement;
   private shearStiffnessSlider: HTMLInputElement;
@@ -126,14 +126,6 @@ export class ClothControls {
     materialGroup.innerHTML = `
       <h4>Material Properties</h4>
       
-      <label for="fabric-type">Fabric Type:</label>
-      <select id="fabric-type">
-        <option value="0">Cotton</option>
-        <option value="1">Silk</option>
-        <option value="2">Leather</option>
-        <option value="3">Rubber</option>
-      </select>
-      
       <div class="slider-container">
         <label for="structural-stiffness">Structural Stiffness:</label>
         <input type="range" id="structural-stiffness" min="100" max="10000" value="5000" step="100">
@@ -172,9 +164,15 @@ export class ClothControls {
     `;
     
     this.customControlsContainer.appendChild(materialGroup);
+
+    const hiddenFabricTypeInput = document.createElement("input");
+    hiddenFabricTypeInput.type = "hidden";
+    hiddenFabricTypeInput.id = "fabric-type";
+    hiddenFabricTypeInput.value = "0"; // 0 = Cotton
+    materialGroup.appendChild(hiddenFabricTypeInput);
     
     // Store references to the controls
-    this.fabricTypeSelect = document.getElementById("fabric-type") as HTMLSelectElement;
+    this.fabricTypeSelect = hiddenFabricTypeInput;
     this.structuralStiffnessSlider = document.getElementById("structural-stiffness") as HTMLInputElement;
     this.structuralStiffnessValue = document.getElementById("structural-stiffness-value") as HTMLSpanElement;
     this.shearStiffnessSlider = document.getElementById("shear-stiffness") as HTMLInputElement;
