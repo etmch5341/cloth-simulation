@@ -31,9 +31,9 @@ with each other or the floor.
  - ~~Test to demo each 1-# face (3 seconds for each face test) just run through them~~
 
 ### Free Test
- - Can select a "Free" simulation type where you are allowed to change anything
- - button to enable/disable corner point/center point
- - Can type number of faces (for the face tests)
+ - ~~Can select a "Free" simulation type where you are allowed to change anything~~
+ - ~~button to enable/disable corner point/center point~~
+ - ~~Can type number of faces (for the face tests) -> density~~
 
 ## Additional +features
  - Figure out how to import different models
@@ -56,6 +56,6 @@ with each other or the floor.
 #### 5/1
  - Peridynamics Implementation
  - ~~visualization mode to cloth~~
- - Free tests
+ - ~~Free tests~~
  - Toggling for All new tests and items implemented from 4/30
  - Additional Features
