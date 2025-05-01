@@ -257,7 +257,7 @@ export class ClothAnimation extends CanvasAnimation {
     this.pointRenderPass = new RenderPass(this.extVAO, gl, pointVSText, pointFSText);
     
     this.gui = new GUI(this.canvas2d, this);
-    this.lightPosition = new Vec4([-10, 10, -10, 1]);
+    this.lightPosition = new Vec4([-5, 15, -5, 1]);
     this.backgroundColor = new Vec4([0.0, 0.37254903, 0.37254903, 1.0]);
 
     this.initFloor();
