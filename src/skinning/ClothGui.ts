@@ -517,6 +517,14 @@ export class GUI implements IGUI {
     this.currentFaceCount = faceCount;
   }
 
+  private isWindEnabled(): boolean {
+    const cloth = this.animation.getCloth();
+    if (!cloth) return false;
+    
+    // If wind strength is greater than 0, wind is enabled
+    return cloth.windStrength > 0;
+  }
+
   public getModeString(): string {
     const cloth = this.animation.getCloth();
     const fabricNames = ["Cotton", "Silk", "Leather", "Rubber"];
@@ -528,7 +536,7 @@ export class GUI implements IGUI {
     
     switch (this.mode) {
       case Mode.edit: { 
-        return `Mode: Edit | Fabric: ${fabricName} | Wind: ${this.windEnabled ? "ON" : "OFF"}`;
+        return `Mode: Edit | Fabric: ${fabricName} | Wind: ${this.isWindEnabled() ? "ON" : "OFF"}`;
       }
       case Mode.playback: { 
         return `Mode: Simulation | Time: ${this.time.toFixed(2)} | Energy: ${cloth.totalEnergy.toFixed(2)}`;
