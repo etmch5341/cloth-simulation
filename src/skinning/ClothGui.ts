@@ -65,6 +65,10 @@ export class GUI implements IGUI {
   private windStrength: number = 5.0;
   private currentFabricType: FabricType = FabricType.COTTON;
 
+  // Mesh test properties
+  private isMeshTest: boolean = false;
+  private currentFaceCount: number = 0;
+
   public time: number;
   public mode: Mode;
 
@@ -307,7 +311,7 @@ export class GUI implements IGUI {
         this.animation.initSphereDropTest();
         break;
       }
-      case "KeyA": {
+      case "KeyY": {
         // Test all fabric types in sequence
         this.animation.testFabricGrid();
         break;
@@ -503,10 +507,19 @@ export class GUI implements IGUI {
     }
   }
 
+  public setMeshTestMode(enabled: boolean, faceCount: number = 0): void {
+    this.isMeshTest = enabled;
+    this.currentFaceCount = faceCount;
+  }
+
   public getModeString(): string {
     const cloth = this.animation.getCloth();
     const fabricNames = ["Cotton", "Silk", "Leather", "Rubber"];
     const fabricName = fabricNames[this.currentFabricType];
+
+    if (this.isMeshTest) {
+      return `Mode: Mesh Test | Faces: ${this.currentFaceCount} | Time: ${this.time.toFixed(2)}`;
+    }
     
     switch (this.mode) {
       case Mode.edit: { 

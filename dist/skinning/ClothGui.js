@@ -33,6 +33,9 @@ export class GUI {
         this.windEnabled = false;
         this.windStrength = 5.0;
         this.currentFabricType = FabricType.COTTON;
+        // Mesh test properties
+        this.isMeshTest = false;
+        this.currentFaceCount = 0;
         this.height = canvas.height;
         this.viewPortHeight = this.height - 200;
         this.width = canvas.width;
@@ -219,7 +222,7 @@ export class GUI {
                 this.animation.initSphereDropTest();
                 break;
             }
-            case "KeyA": {
+            case "KeyY": {
                 // Test all fabric types in sequence
                 this.animation.testFabricGrid();
                 break;
@@ -397,10 +400,17 @@ export class GUI {
             }
         }
     }
+    setMeshTestMode(enabled, faceCount = 0) {
+        this.isMeshTest = enabled;
+        this.currentFaceCount = faceCount;
+    }
     getModeString() {
         const cloth = this.animation.getCloth();
         const fabricNames = ["Cotton", "Silk", "Leather", "Rubber"];
         const fabricName = fabricNames[this.currentFabricType];
+        if (this.isMeshTest) {
+            return `Mode: Mesh Test | Faces: ${this.currentFaceCount} | Time: ${this.time.toFixed(2)}`;
+        }
         switch (this.mode) {
             case Mode.edit: {
                 return `Mode: Edit | Fabric: ${fabricName} | Wind: ${this.windEnabled ? "ON" : "OFF"}`;

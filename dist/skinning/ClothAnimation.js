@@ -38,6 +38,10 @@ export class ClothAnimation extends CanvasAnimation {
         this.sphereVisible = true;
         // Current test tracker
         this.currentTestIndex = 0;
+        // Mesh Test properties
+        this.meshTestEnabled = false;
+        this.meshTestTimer = null;
+        this.meshTestFaceCounts = [1, 4, 16, 64, 256, 1024, 4096];
         this.testConfigurations = [
             {
                 name: "Sphere Drop Test",
@@ -136,6 +140,20 @@ export class ClothAnimation extends CanvasAnimation {
                 windEnabled: false,
                 windStrength: 1000.0,
                 windDirection: new Vec3([0, 0, 1])
+            },
+            {
+                name: "Progressive Mesh Test",
+                fabricType: FabricType.COTTON,
+                sphereRadius: 1.5,
+                spherePosition: new Vec3([0, 1.5, 0]),
+                pinCorners: false,
+                pinCenter: false,
+                gravity: new Vec3([0, -9.8, 0]),
+                clothDensity: 10, // This will be overridden
+                clothHeight: 4.0,
+                windEnabled: false,
+                windStrength: 0,
+                windDirection: new Vec3([0, 0, 1])
             }
         ];
         this.canvas2d = document.getElementById("textCanvas");
@@ -182,6 +200,8 @@ export class ClothAnimation extends CanvasAnimation {
     reset() {
         this.gui.reset();
         // this.initSphereDropTest();
+        // Stop progressive mesh test if running
+        this.stopProgressiveMeshTest();
         this.runClothTest(this.currentTestIndex);
     }
     getCloth() {
@@ -785,8 +805,15 @@ export class ClothAnimation extends CanvasAnimation {
             console.error(`Invalid test configuration index: ${configIndex}`);
             return;
         }
+        // Stop any existing progressive mesh test
+        this.stopProgressiveMeshTest();
         // Store the current test index
         this.currentTestIndex = configIndex;
+        // Check if this is the progressive mesh test
+        if (configIndex === 7) { // Assuming it's the 8th item (index 7) in the array
+            this.runProgressiveMeshTest();
+            return;
+        }
         const config = this.testConfigurations[configIndex];
         console.log(`Running cloth test: ${config.name}`);
         // Set up basic parameters
@@ -853,6 +880,106 @@ export class ClothAnimation extends CanvasAnimation {
         this.initSphereRenderPass();
         // Start simulation
         this.gui.setMode(Mode.playback);
+    }
+    // Modify the runProgressiveMeshTest method to explicitly handle corner pinning
+    runProgressiveMeshTest() {
+        // Stop any existing test
+        this.stopProgressiveMeshTest();
+        // Enable mesh test mode
+        this.meshTestEnabled = true;
+        // Set mode to playback
+        this.gui.setMode(Mode.playback);
+        let currentIndex = 0;
+        const runNextMeshTest = () => {
+            if (!this.meshTestEnabled)
+                return;
+            const faceCount = this.meshTestFaceCounts[currentIndex];
+            // Calculate rows and columns needed to achieve the desired face count
+            // A cloth with R rows and C columns has (R-1)*(C-1)*2 triangular faces
+            // For simplicity, we'll use a square cloth (R=C)
+            // We solve (R-1)²*2 = faceCount for R
+            const rowsCols = Math.max(2, Math.ceil(Math.sqrt(faceCount / 2) + 1));
+            console.log(`Running mesh test with ${faceCount} faces (${rowsCols}x${rowsCols} grid)`);
+            // Update GUI to display current face count
+            this.gui.setMeshTestMode(true, faceCount);
+            // Create the cloth with custom settings
+            // Instead of using initSphereDropTest which has hardcoded corner pinning,
+            // we'll create and configure the cloth directly
+            // Create a new cloth with the calculated resolution
+            this.cloth = new Cloth(this.clothWidth, this.clothHeight, rowsCols, rowsCols, FabricType.COTTON);
+            // Configure the cloth based on test settings
+            const config = this.testConfigurations[7]; // Progressive Mesh Test config
+            // Set gravity
+            this.cloth.gravity = config.gravity;
+            // Position the cloth
+            const clothStartY = config.spherePosition.y + config.sphereRadius + config.clothHeight;
+            const clothSize = config.sphereRadius * 3.0;
+            const stepSize = clothSize / (rowsCols - 1);
+            // Position cloth particles
+            for (let i = 0; i < this.cloth.particles.length; i++) {
+                for (let j = 0; j < this.cloth.particles[i].length; j++) {
+                    // Calculate position to center cloth over sphere
+                    const x = (j * stepSize) - (clothSize / 2) + config.spherePosition.x;
+                    const z = (i * stepSize) - (clothSize / 2) + config.spherePosition.z;
+                    this.cloth.particles[i][j].position.x = x;
+                    this.cloth.particles[i][j].position.y = clothStartY;
+                    this.cloth.particles[i][j].position.z = z;
+                    // Update old position to match
+                    this.cloth.particles[i][j].oldPosition.x = x;
+                    this.cloth.particles[i][j].oldPosition.y = clothStartY;
+                    this.cloth.particles[i][j].oldPosition.z = z;
+                    // By default, don't pin any particles
+                    this.cloth.particles[i][j].setFixed(false);
+                }
+            }
+            // Pin corners only if specified in config
+            if (config.pinCorners) {
+                const lastRow = this.cloth.particles.length - 1;
+                const lastCol = this.cloth.particles[0].length - 1;
+                this.cloth.particles[0][0].setFixed(true);
+                this.cloth.particles[0][lastCol].setFixed(true);
+                this.cloth.particles[lastRow][0].setFixed(true);
+                this.cloth.particles[lastRow][lastCol].setFixed(true);
+            }
+            // Pin center if specified in config
+            if (config.pinCenter) {
+                const centerRow = Math.floor(this.cloth.particles.length / 2);
+                const centerCol = Math.floor(this.cloth.particles[0].length / 2);
+                this.cloth.particles[centerRow][centerCol].setFixed(true);
+            }
+            // Create sphere collider
+            this.sphere = new SphereCollider(config.spherePosition, config.sphereRadius);
+            this.cloth.clearCollisionObjects();
+            this.cloth.addCollisionObject(this.sphere);
+            // Configure wind if enabled
+            if (config.windEnabled) {
+                this.cloth.windStrength = config.windStrength;
+                this.cloth.windDirection = config.windDirection;
+            }
+            else {
+                this.cloth.windStrength = 0;
+            }
+            // Initialize render passes
+            this.initClothRenderPass();
+            this.initWireframeRenderPass();
+            this.initSpringRenderPass();
+            this.initPointRenderPass();
+            this.initSphereRenderPass();
+            // Move to next face count in 3 seconds
+            currentIndex = (currentIndex + 1) % this.meshTestFaceCounts.length;
+            this.meshTestTimer = window.setTimeout(runNextMeshTest, 3000);
+        };
+        // Start the first test
+        runNextMeshTest();
+    }
+    stopProgressiveMeshTest() {
+        this.meshTestEnabled = false;
+        if (this.meshTestTimer !== null) {
+            window.clearTimeout(this.meshTestTimer);
+            this.meshTestTimer = null;
+        }
+        // Reset GUI state
+        this.gui.setMeshTestMode(false);
     }
     // Run all test configurations in sequence
     runAllClothTests() {
