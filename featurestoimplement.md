@@ -25,13 +25,15 @@ with each other or the floor.
 
 ### Toggling
  - ~~Toggle b/w different scenes and tests (ensure that they all work)~~
- - button to enable/disable corner point/center point
- - Can type number of faces (for the face tests)
  - ~~Reset should replay the current animation enabled w/ updated params if they changed~~
 
 ### Different Tests
- - Test to demo each 1-# face (3 seconds for each face test) just run through them
+ - ~~Test to demo each 1-# face (3 seconds for each face test) just run through them~~
 
+### Free Test
+ - Can select a "Free" simulation type where you are allowed to change anything
+ - button to enable/disable corner point/center point
+ - Can type number of faces (for the face tests)
 
 ## Additional +features
  - Figure out how to import different models
@@ -45,11 +47,12 @@ with each other or the floor.
 #### 4/30
  - ~~All improvements~~
  - ~~removed gravity setting~~
- - Finish toggling (for all current features and ensure that they work)
- - Different Tests: Demo diff # of faces
+ - ~~Finish toggling (for all current features and ensure that they work)~~
+ - ~~Different Tests: Demo diff # of faces~~
  - Squishy Object (squishy ball) Implementation
  - Peridynamics Implementation
 
 #### 5/1
+ - Free tests
  - Toggling for All new tests and items implemented from 4/30
  - Additional Features
