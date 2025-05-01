@@ -552,7 +552,7 @@ export class ClothAnimation extends CanvasAnimation {
             gl.uniformMatrix4fv(loc, false, new Float32Array(this.gui.projMatrix().all()));
         });
         this.wireframeRenderPass.addUniform("wireColor", (gl, loc) => {
-            gl.uniform3fv(loc, new Float32Array([0.0, 1.0, 0.0]));
+            gl.uniform3fv(loc, new Float32Array([0.0, 1.0, 0.0])); // Green wire
         });
         this.wireframeRenderPass.setDrawData(this.ctx.LINE_STRIP, meshData.indices.length, this.ctx.UNSIGNED_INT, 0);
         this.wireframeRenderPass.setup();
