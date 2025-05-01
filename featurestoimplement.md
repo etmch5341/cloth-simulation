@@ -27,7 +27,7 @@ with each other or the floor.
  - Toggle b/w different scenes and tests (ensure that they all work)
  - button to enable/disable corner point/center point
  - Can type number of faces (for the face tests)
- - Reset should replay the current animation enabled w/ updated params if they changed
+ - ~~Reset should replay the current animation enabled w/ updated params if they changed~~
 
 ### Different Tests
  - Test to demo each 1-# face (3 seconds for each face test) just run through them
