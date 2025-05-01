@@ -3,6 +3,7 @@ import { CanvasAnimation } from "../lib/webglutils/CanvasAnimation.js";
 import { ClothAnimation } from "./ClothAnimation.js";
 import { Mat4, Vec3, Vec4, Vec2 } from "../lib/TSM.js";
 import { FabricType } from "./Cloth.js";
+import { ClothControls } from "./ClothControls.js";
 
 /**
  * Might be useful for designing any animation GUI
@@ -62,12 +63,15 @@ export class GUI implements IGUI {
   
   // Cloth control parameters
   private windEnabled: boolean = false;
-  private windStrength: number = 5.0;
+  private windStrength: number = 0.0;
   private currentFabricType: FabricType = FabricType.COTTON;
 
   // Mesh test properties
   private isMeshTest: boolean = false;
   private currentFaceCount: number = 0;
+
+  // Cloth test property
+  public clothControls: ClothControls | null = null;
 
   public time: number;
   public mode: Mode;
@@ -562,5 +566,9 @@ export class GUI implements IGUI {
     canvas.addEventListener("contextmenu", (event: any) =>
       event.preventDefault()
     );
+  }
+
+  public getClothControls(): ClothControls | null {
+    return this.clothControls;
   }
 }

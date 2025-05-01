@@ -31,11 +31,13 @@ export class GUI {
         this.mousePosition = new Vec2([0, 0]);
         // Cloth control parameters
         this.windEnabled = false;
-        this.windStrength = 5.0;
+        this.windStrength = 0.0;
         this.currentFabricType = FabricType.COTTON;
         // Mesh test properties
         this.isMeshTest = false;
         this.currentFaceCount = 0;
+        // Cloth test property
+        this.clothControls = null;
         this.height = canvas.height;
         this.viewPortHeight = this.height - 200;
         this.width = canvas.width;
@@ -437,6 +439,9 @@ export class GUI {
         canvas.addEventListener("mouseup", (mouse) => this.dragEnd(mouse));
         /* Event listener to stop the right click menu */
         canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+    }
+    getClothControls() {
+        return this.clothControls;
     }
 }
 GUI.rotationSpeed = 0.05;

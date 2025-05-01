@@ -1,11 +1,3 @@
-// import { ClothAnimation } from "./ClothAnimation.js";
-// export function initializeCanvas(): void {
-//   const canvas = document.getElementById("glCanvas") as HTMLCanvasElement;
-//   /* Start drawing */
-//   const canvasAnimation: ClothAnimation = new ClothAnimation(canvas);
-//   canvasAnimation.start();
-// }
-// initializeCanvas();
 import { ClothAnimation } from "./ClothAnimation.js";
 import { ClothControls } from "./ClothControls.js";
 export function initializeCanvas() {
@@ -14,6 +6,13 @@ export function initializeCanvas() {
     const clothAnimation = new ClothAnimation(canvas);
     /* Initialize UI controls */
     const clothControls = new ClothControls(clothAnimation);
+    // Store reference to controls in GUI for updates
+    if (clothAnimation.getGUI) {
+        const gui = clothAnimation.getGUI();
+        if (gui) {
+            gui.clothControls = clothControls;
+        }
+    }
     /* Start animation loop */
     clothAnimation.start();
 }

@@ -37,6 +37,20 @@
         border-radius: 6px;
       }
       
+      .control-group h4 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: white;
+        font-size: 1.1em;
+      }
+      
+      .control-group h5 {
+        margin-top: 15px;
+        margin-bottom: 10px;
+        color: white;
+        font-size: 0.9em;
+      }
+      
       .control-group label {
         display: block;
         margin-bottom: 8px;
@@ -68,6 +82,7 @@
       
       .slider-container {
         margin-top: 10px;
+        margin-bottom: 12px;
       }
       
       .slider-container label {
@@ -138,6 +153,16 @@
         left: 0;
         /* Don't set width/height here - keep the original attributes */
       }
+      
+      /* Custom controls container styling */
+      #custom-controls-container {
+        max-height: 600px;
+        overflow-y: auto;
+      }
+      
+      #custom-controls-container .control-group {
+        margin-bottom: 15px;
+      }
     </style>
   </head>
   <body>
@@ -164,31 +189,14 @@
             <option value="5">Wind Test</option>
             <option value="6">Centerpiece</option>
             <option value="7">Progressive Mesh Test</option>
+            <option value="8">Custom Parameters</option>
           </select>
         </div>
         
-        
-        <!-- <div class="control-group">
-          <label for="render-mode">Render Mode:</label>
-          <select id="render-mode">
-            <option value="0">Shaded</option>
-            <option value="1">Wireframe</option>
-            <option value="2">Points</option>
-            <option value="3">Springs</option>
-          </select>
-        </div> -->
-        
-        <!-- <div class="control-group">
-          <label class="checkbox-label">
-            <input type="checkbox" id="toggle-wind">
-            Enable Wind
-          </label>
-          <div class="slider-container">
-            <label for="wind-strength">Wind Strength:</label>
-            <input type="range" id="wind-strength" min="0" max="20" value="5" step="0.5">
-            <span id="wind-strength-value">5.0</span>
-          </div>
-        </div> -->
+        <!-- Container for custom controls (will be populated by JavaScript) -->
+        <div id="custom-controls-container" style="display: none;">
+          <!-- Custom control elements will be created dynamically -->
+        </div>
         
         <div class="control-group">
           <button id="reset-simulation">Reset Simulation</button>

@@ -218,7 +218,21 @@ export class ClothAnimation extends CanvasAnimation {
         windEnabled: false,
         windStrength: 0,
         windDirection: new Vec3([0, 0, 1])
-    }
+    },
+    {
+        name: "Custom Parameters",
+        fabricType: FabricType.COTTON,
+        sphereRadius: 1.5,
+        spherePosition: new Vec3([0, 1.5, 0]),
+        pinCorners: true,
+        pinCenter: false,
+        gravity: new Vec3([0, -9.8, 0]),
+        clothDensity: 20,
+        clothHeight: 4.0,
+        windEnabled: false,
+        windStrength: 0,
+        windDirection: new Vec3([0, 0, 1])
+      }
   ];
 
   constructor(canvas: HTMLCanvasElement) {
@@ -1059,7 +1073,7 @@ export class ClothAnimation extends CanvasAnimation {
     this.renderMode = mode;
   }
   
-  public toggleWind(enable: boolean, strength: number = 5.0): void {
+  public toggleWind(enable: boolean, strength: number = 0.0): void {
     this.cloth.windStrength = enable ? strength : 0.0;
   }
   
@@ -1270,6 +1284,13 @@ export class ClothAnimation extends CanvasAnimation {
     
     // Start simulation
     this.gui.setMode(Mode.playback);
+
+    if (this.gui && this.gui.getClothControls) {
+        const controls = this.gui.getClothControls();
+        if (controls) {
+          controls.updateControlsFromSimulation();
+        }
+      }
   }
 
   // Modify the runProgressiveMeshTest method to explicitly handle corner pinning
@@ -1588,5 +1609,164 @@ export class ClothAnimation extends CanvasAnimation {
   // Add this getter method
   public getRenderMode(): RenderMode {
     return this.renderMode;
+  }
+
+  public updateCustomParameters(
+    params: {
+      fabricType?: FabricType;
+      structuralStiffness?: number;
+      shearStiffness?: number;
+      bendStiffness?: number;
+      damping?: number;
+      mass?: number; 
+      stretchFactor?: number;
+      pinCorners?: boolean;
+      pinCenter?: boolean;
+      clothDensity?: number;
+      windEnabled?: boolean;
+      windStrength?: number;
+      windDirection?: Vec3;
+    }
+  ): void {
+    // Store the current configuration index
+    const currentIndex = this.currentTestIndex;
+    
+    // Update fabric properties
+    if (params.fabricType !== undefined) {
+      this.fabricType = params.fabricType;
+    }
+    
+    // Update custom fabric presets if material properties are provided
+    if (params.structuralStiffness !== undefined || 
+        params.shearStiffness !== undefined || 
+        params.bendStiffness !== undefined ||
+        params.damping !== undefined ||
+        params.mass !== undefined ||
+        params.stretchFactor !== undefined) {
+      
+      // Create a custom fabric preset based on the current fabric type
+      const currentProps = FABRIC_PRESETS.get(this.fabricType)!;
+      const customProps = {
+        structuralStiffness: params.structuralStiffness !== undefined ? params.structuralStiffness : currentProps.structuralStiffness,
+        shearStiffness: params.shearStiffness !== undefined ? params.shearStiffness : currentProps.shearStiffness,
+        bendStiffness: params.bendStiffness !== undefined ? params.bendStiffness : currentProps.bendStiffness,
+        damping: params.damping !== undefined ? params.damping : currentProps.damping,
+        mass: params.mass !== undefined ? params.mass : currentProps.mass,
+        stretchFactor: params.stretchFactor !== undefined ? params.stretchFactor : currentProps.stretchFactor
+      };
+      
+      // Override the current fabric type's properties
+      FABRIC_PRESETS.set(this.fabricType, customProps);
+    }
+    
+    // If we're changing cloth density, we need to recreate the cloth
+    const recreateCloth = params.clothDensity !== undefined && 
+                          params.clothDensity !== this.testConfigurations[currentIndex].clothDensity;
+    
+    // Update test configuration
+    if (params.pinCorners !== undefined) {
+      this.testConfigurations[currentIndex].pinCorners = params.pinCorners;
+    }
+    
+    if (params.pinCenter !== undefined) {
+      this.testConfigurations[currentIndex].pinCenter = params.pinCenter;
+    }
+    
+    if (params.clothDensity !== undefined) {
+      this.testConfigurations[currentIndex].clothDensity = params.clothDensity;
+    }
+    
+    if (params.windEnabled !== undefined) {
+      this.testConfigurations[currentIndex].windEnabled = params.windEnabled;
+      
+      // Update wind strength based on enabled state
+      if (params.windEnabled) {
+        if (params.windStrength !== undefined) {
+          this.testConfigurations[currentIndex].windStrength = params.windStrength;
+        } else if (this.testConfigurations[currentIndex].windStrength === 0) {
+          this.testConfigurations[currentIndex].windStrength = 20.0; // Default if previously 0
+        }
+      } else {
+        this.testConfigurations[currentIndex].windStrength = 0;
+      }
+    } else if (params.windStrength !== undefined) {
+      this.testConfigurations[currentIndex].windStrength = params.windStrength;
+      
+      // Enable wind if strength is set to non-zero
+      if (params.windStrength > 0) {
+        this.testConfigurations[currentIndex].windEnabled = true;
+      } else {
+        this.testConfigurations[currentIndex].windEnabled = false;
+      }
+    }
+    
+    if (params.windDirection !== undefined) {
+      this.testConfigurations[currentIndex].windDirection = params.windDirection.normalize();
+    }
+    
+    // Apply changes to the cloth
+    if (recreateCloth) {
+      // If we need to change cloth density, recreate the entire cloth
+      this.runClothTest(currentIndex);
+    } else {
+      // Otherwise, just update the existing cloth
+      
+      // Update wind parameters
+      this.cloth.windStrength = this.testConfigurations[currentIndex].windEnabled ? 
+                                this.testConfigurations[currentIndex].windStrength : 0;
+      this.cloth.windDirection = this.testConfigurations[currentIndex].windDirection;
+      
+      // Update pin status for corners and center
+      this.updatePinStatus();
+    }
+  }
+  
+  // Helper method to update pin status based on configuration
+  private updatePinStatus(): void {
+    const config = this.testConfigurations[this.currentTestIndex];
+    const rows = this.cloth.particles.length;
+    const cols = this.cloth.particles[0].length;
+    
+    // Reset all pins
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        this.cloth.particles[i][j].setFixed(false);
+      }
+    }
+    
+    // Pin corners if specified
+    if (config.pinCorners) {
+      const lastRow = rows - 1;
+      const lastCol = cols - 1;
+      
+      this.cloth.particles[0][0].setFixed(true);
+      this.cloth.particles[0][lastCol].setFixed(true);
+      this.cloth.particles[lastRow][0].setFixed(true);
+      this.cloth.particles[lastRow][lastCol].setFixed(true);
+    }
+    
+    // Pin center if specified
+    if (config.pinCenter) {
+      const centerRow = Math.floor(rows / 2);
+      const centerCol = Math.floor(cols / 2);
+      this.cloth.particles[centerRow][centerCol].setFixed(true);
+    }
+  }
+
+  /**
+ * Get the current fabric type
+ */
+  public getFabricType(): FabricType {
+    return this.fabricType;
+  }
+  
+  /**
+   * Get the current test configuration
+   */
+  public getCurrentTestConfig(): ClothTestConfig | null {
+    if (this.currentTestIndex < 0 || this.currentTestIndex >= this.testConfigurations.length) {
+      return null;
+    }
+    return this.testConfigurations[this.currentTestIndex];
   }
 }
