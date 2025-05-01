@@ -60,4 +60,5 @@ with each other or the floor.
  - ~~Free tests~~
  - Toggling for All new tests and items implemented from 4/30
  - ~~Lighting improvements (so sphere is not dark)~~
+ - ~~playback properly displays if wind on/off~~
  - Additional Features
