@@ -60,6 +60,21 @@ To complie and run this project it is the same as with the previous projects inv
      - 'P': Pause/Play simulation
      - 'R': Reset simulation
 
+# Custom Parameter Test
+You can run a custom parameter test that allows you to adjust all the aspects of the simulation accordingly. 
+
+ 1. Navigate to the **Simulation Type** section and select **Custom Parameters**
+ 2. You can enable and change the properties of materials, cloth configuration, and wind configuration.
+
+## Some unique features in "Custom Mode"
+ - Let's say that you run the simulation by setting no pins and press "Reset Simulation" or "Reset Pin Configuration", while it is falling you can select "Pin Corners" or "Pin Center" and press "Reset Pin Configuration" while it is falling to catch it in the air. You can also do this manually by "Shift + clicking" on the cloth.
+
+![alt text](image-1.png)
+
+ - You can setup a situation where you enable "Pin Corners" remove 2 corners from one side by "Shift + clicking", creating a dagling cloth from a line. You can then enable the wind and see the effects of wind on a flat cloth. (Move the camera around to isolate the pinnned corner better so no other particles are interacting with it and you can unpin it easier.)
+
+![alt text](image.png)
+
 # Main Project Components
 
  - `Cloth.ts`: Core cloth simulation implementation
