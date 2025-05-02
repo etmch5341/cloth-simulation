@@ -7,6 +7,7 @@ export var FabricType;
     FabricType[FabricType["SILK"] = 1] = "SILK";
     FabricType[FabricType["LEATHER"] = 2] = "LEATHER";
     FabricType[FabricType["RUBBER"] = 3] = "RUBBER";
+    FabricType[FabricType["CUSTOM"] = 4] = "CUSTOM";
 })(FabricType || (FabricType = {}));
 export const FABRIC_PRESETS = new Map([
     [FabricType.COTTON, {
@@ -40,6 +41,14 @@ export const FABRIC_PRESETS = new Map([
             damping: 5,
             mass: 1.5,
             stretchFactor: 1.5
+        }],
+    [FabricType.CUSTOM, {
+            structuralStiffness: 5000,
+            shearStiffness: 100,
+            bendStiffness: 10,
+            damping: 5,
+            mass: 1.0,
+            stretchFactor: 1.05
         }]
 ]);
 export class Cloth {

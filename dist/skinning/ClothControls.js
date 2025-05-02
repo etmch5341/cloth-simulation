@@ -2,6 +2,7 @@ import { FABRIC_PRESETS } from "./Cloth.js";
 import { Vec3 } from "../lib/TSM.js";
 export class ClothControls {
     constructor(animation) {
+        this.fabricTypeDefaults = new Map();
         // Track if we need to show custom controls
         this.isCustomSimulation = false;
         this.customControlsCreated = false;
@@ -116,7 +117,7 @@ export class ClothControls {
         const hiddenFabricTypeInput = document.createElement("input");
         hiddenFabricTypeInput.type = "hidden";
         hiddenFabricTypeInput.id = "fabric-type";
-        hiddenFabricTypeInput.value = "0"; // 0 = Cotton
+        hiddenFabricTypeInput.value = "4"; // 0 = Cotton
         materialGroup.appendChild(hiddenFabricTypeInput);
         // Store references to the controls
         this.fabricTypeSelect = hiddenFabricTypeInput;
@@ -132,6 +133,16 @@ export class ClothControls {
         this.massValue = document.getElementById("mass-value");
         this.stretchFactorSlider = document.getElementById("stretch-factor");
         this.stretchFactorValue = document.getElementById("stretch-factor-value");
+        const resetButton = document.createElement("button");
+        resetButton.id = "reset-material-properties";
+        resetButton.textContent = "Reset Material Properties";
+        resetButton.style.marginTop = "15px";
+        materialGroup.appendChild(resetButton);
+        this.resetMaterialButton = resetButton;
+        // Create a deep copy of the fabric presets for later reset
+        FABRIC_PRESETS.forEach((props, type) => {
+            this.fabricTypeDefaults.set(type, Object.assign({}, props));
+        });
     }
     createClothConfigurationControls() {
         const clothConfigGroup = document.createElement("div");
@@ -233,6 +244,9 @@ export class ClothControls {
         this.stretchFactorSlider.addEventListener("input", () => {
             this.stretchFactorValue.textContent = parseFloat(this.stretchFactorSlider.value).toFixed(2);
             this.updateCustomParameters();
+        });
+        this.resetMaterialButton.addEventListener("click", () => {
+            this.resetMaterialProperties();
         });
         // Cloth configuration listeners
         this.pinCornersCheckbox.addEventListener("change", () => this.updateCustomParameters());
@@ -363,6 +377,31 @@ export class ClothControls {
         };
         // Update the simulation
         this.animation.updateCustomParameters(params);
+    }
+    resetMaterialProperties() {
+        // Get the current fabric type
+        const fabricType = parseInt(this.fabricTypeSelect.value);
+        // Get default properties for this fabric type
+        const defaultProps = this.fabricTypeDefaults.get(fabricType);
+        if (!defaultProps)
+            return;
+        // Update the UI sliders
+        this.structuralStiffnessSlider.value = defaultProps.structuralStiffness.toString();
+        this.structuralStiffnessValue.textContent = defaultProps.structuralStiffness.toString();
+        this.shearStiffnessSlider.value = defaultProps.shearStiffness.toString();
+        this.shearStiffnessValue.textContent = defaultProps.shearStiffness.toString();
+        this.bendStiffnessSlider.value = defaultProps.bendStiffness.toString();
+        this.bendStiffnessValue.textContent = defaultProps.bendStiffness.toString();
+        this.dampingSlider.value = defaultProps.damping.toString();
+        this.dampingValue.textContent = defaultProps.damping.toString();
+        this.massSlider.value = defaultProps.mass.toString();
+        this.massValue.textContent = defaultProps.mass.toFixed(1);
+        this.stretchFactorSlider.value = defaultProps.stretchFactor.toString();
+        this.stretchFactorValue.textContent = defaultProps.stretchFactor.toFixed(2);
+        // Reset the fabric properties in the presets map
+        FABRIC_PRESETS.set(fabricType, Object.assign({}, defaultProps));
+        // Update the simulation
+        this.updateCustomParameters();
     }
 }
 //# sourceMappingURL=ClothControls.js.map

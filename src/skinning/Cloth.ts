@@ -6,7 +6,8 @@ export enum FabricType {
   COTTON,
   SILK,
   LEATHER,
-  RUBBER
+  RUBBER,
+  CUSTOM
 }
 
 // Define material presets
@@ -51,6 +52,14 @@ export const FABRIC_PRESETS: Map<FabricType, FabricProperties> = new Map([
     damping: 5,
     mass: 1.5,
     stretchFactor: 1.5
+  }],
+  [FabricType.CUSTOM, {
+    structuralStiffness: 5000,
+    shearStiffness: 100,
+    bendStiffness: 10,
+    damping: 5,
+    mass: 1.0,
+    stretchFactor: 1.05
   }]
 ]);
 

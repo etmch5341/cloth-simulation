@@ -63,3 +63,28 @@ with each other or the floor.
  - ~~playback properly displays if wind on/off~~
  - ~~Removed unncecessary keys~~
  - Additional Features
+
+ - ~~Add reset to default button for material properties~~
+ - ~~Fix issue where for custom test the params are copied to original sphere drop initial test~~
+    - ~~it is because it is modifying the cotton params, probably jsut make sepearte fabric for the custom test~~
+
+
+# Demo Plan
+Alyssa
+talk about cloth simulation
+ - short background 
+
+explain different types of cloths
+
+explain visualizations
+
+different # mesh faces test
+ - change to particle vis. to demo why 1 face not necessarily a bug
+
+Ethan
+custom test seperate
+ - params setting
+     - cloth params
+     - wind params
+ - toggling on/off pins corner, center, set own pins
+ - particle interaction

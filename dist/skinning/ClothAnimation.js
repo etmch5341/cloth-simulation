@@ -157,7 +157,7 @@ export class ClothAnimation extends CanvasAnimation {
             },
             {
                 name: "Custom Parameters",
-                fabricType: FabricType.COTTON,
+                fabricType: FabricType.CUSTOM,
                 sphereRadius: 1.5,
                 spherePosition: new Vec3([0, 1.5, 0]),
                 pinCorners: true,
