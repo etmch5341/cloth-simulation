@@ -1,8 +1,3 @@
-1. Ethan Chandra (ec42227), Alyssa Chan (awc894)
-2. N/A
-3. **Extra Credit**: Both partners working on this project affirm, on our honor, that we have completed and submitted the survey. 
-4. **Project Details**
-
 # Project Overview
 This project implements a physically accurate cloth simulation using a mass-spring system. The simulation models different fabric types (cotton, silk, leather, and rubber) and includes interactions with physical objects. The system allows for realistic cloth draping, wind effects, and user interaction through a comprehensive UI.
 
